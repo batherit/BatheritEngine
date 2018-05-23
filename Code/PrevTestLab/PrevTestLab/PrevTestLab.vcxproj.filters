@@ -13,17 +13,35 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="소스 파일\Command">
+      <UniqueIdentifier>{e7e939b7-638f-4740-8d82-42274420f1b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Framework">
+      <UniqueIdentifier>{810c702e-05ca-48ef-97ba-8e7a18128ba3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="CGameCmd.cpp">
+      <Filter>소스 파일\Command</Filter>
+    </ClCompile>
+    <ClCompile Include="CGameTimer.cpp">
+      <Filter>소스 파일\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="CGameFramework.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CGameCmd.h">
+      <Filter>소스 파일\Command</Filter>
+    </ClInclude>
+    <ClInclude Include="CGameTimer.h">
+      <Filter>소스 파일\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="CGameFramework.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

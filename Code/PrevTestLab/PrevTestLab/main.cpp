@@ -1,12 +1,13 @@
 #include<iostream>
+#include"CGameTimer.h"
 using namespace std;
 
 int main(void){
 	while (true) {
-		CCommand cmd = GetCommand();
+		/*CCommand cmd = GetCommand();
 		handleCommand(cmd);
 		Update();
-		Render();
+		Render();*/
 	}
 	return 0;
 }
