@@ -6,7 +6,7 @@ enum TimerType { TIMER_TYPE_TIME, TIMER_TYPE_WINDOWS};
 class CGameTimer sealed
 {
 public:
-	CGameTimer(TimerType timer_type = TIMER_TYPE_TIME);
+	CGameTimer(TimerType timer_type = TIMER_TYPE_WINDOWS);
 	~CGameTimer();
 
 	void Reset();						// 타이머 속성을 초기화

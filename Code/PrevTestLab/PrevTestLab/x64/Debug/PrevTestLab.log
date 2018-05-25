@@ -1,6 +1,2 @@
-﻿  CGameFramework.cpp
-  CGameTimer.cpp
-d:\my lab\gamelab\gameengine\batheritengine\code\prevtestlab\prevtestlab\cgametimer.cpp(45): warning C4101: 'frequency' :참조되지 않은 지역 변수입니다.
-  main.cpp
-  코드를 생성하고 있습니다...
+﻿  main.cpp
   PrevTestLab.vcxproj -> D:\My Lab\GameLab\GameEngine\BatheritEngine\Code\PrevTestLab\x64\Debug\PrevTestLab.exe
