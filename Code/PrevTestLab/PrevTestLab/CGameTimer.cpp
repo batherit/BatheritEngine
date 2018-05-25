@@ -42,7 +42,6 @@ void CGameTimer::Reset() {
 	pause_total_time_ = 0;
 	elapsed_time_per_frame_ = 0.0f;
 
-	ClockCnt frequency;
 	switch (timer_type_)
 	{
 	case TIMER_TYPE_TIME:
