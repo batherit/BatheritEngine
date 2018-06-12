@@ -19,6 +19,12 @@
     <Filter Include="소스 파일\Framework">
       <UniqueIdentifier>{810c702e-05ca-48ef-97ba-8e7a18128ba3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\Component">
+      <UniqueIdentifier>{9a724059-a135-43ed-8a87-1af35aee4aca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Component\Message">
+      <UniqueIdentifier>{f6d4cb34-aa1c-4e21-9bf2-49344b9bc040}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -30,8 +36,20 @@
     <ClCompile Include="CGameTimer.cpp">
       <Filter>소스 파일\Framework</Filter>
     </ClCompile>
+    <ClCompile Include="CGameComponent.cpp">
+      <Filter>소스 파일\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="CGameObject.cpp">
+      <Filter>소스 파일\Component</Filter>
+    </ClCompile>
     <ClCompile Include="CGameFramework.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>소스 파일\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="CGameState.cpp">
+      <Filter>소스 파일\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="CGameStateMachine.cpp">
+      <Filter>소스 파일\Component</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -41,8 +59,20 @@
     <ClInclude Include="CGameTimer.h">
       <Filter>소스 파일\Framework</Filter>
     </ClInclude>
+    <ClInclude Include="CGameComponent.h">
+      <Filter>소스 파일\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="CGameObject.h">
+      <Filter>소스 파일\Component</Filter>
+    </ClInclude>
     <ClInclude Include="CGameFramework.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>소스 파일\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="CGameState.h">
+      <Filter>소스 파일\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="CGameStateMachine.h">
+      <Filter>소스 파일\Component</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

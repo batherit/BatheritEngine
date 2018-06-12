@@ -1,9 +1,10 @@
 #include<iostream> 
 #include<conio.h> 
-#include"CGameTimer.h" 
+#include"CGameTimer.h"
+#include"CGameObject.h"
 using namespace std;
 
-CGameTimer test_timer(TIMER_TYPE_WINDOWS);
+CGameTimer g_test_timer(TIMER_TYPE_WINDOWS);
 
 char GetKey(void) {
 	// 키보드 입력 감지를 true, false로 반환 
@@ -17,30 +18,45 @@ void HandleCommand(char& ch) {
 	switch (ch) {
 	case 'r': case 'R':
 		cout << "reset" << endl;
-		test_timer.Reset();
+		g_test_timer.Reset();
 		break;
 	case 'p': case 'P':
 		cout << "pause" << endl;
-		test_timer.RunToPause();
+		g_test_timer.RunToPause();
 		break;
 	case 's': case 'S':
 		cout << "start" << endl;
-		test_timer.PauseToRun();
+		g_test_timer.PauseToRun();
 		break;
 	case 't': case 'T':
 		cout << "print result" << endl;
-		float time = test_timer.GetElapsedTimePerFrame();
+		float time = g_test_timer.GetElapsedTimePerFrame();
 		cout << "time per frame " << time << "sec " << 1.0f / time << "fps" << endl;
-		time = test_timer.GetTotalTimeFromRun();
+		time = g_test_timer.GetTotalTimeFromRun();
 		cout << "total time " << time << "sec " << endl << endl;
 	}
 }
 
+class TestSingleton {
+private:
+	int num = 5;
+
+public:
+	static TestSingleton& instance() {
+		static TestSingleton *instance = new TestSingleton();
+		return *instance;
+	}
+	
+	void SetNum(int n) { num = n; }
+	void PrintNum(void) { cout << num << endl; }
+};
+
 int main(void) {
-	bool is_paused = false;
+	TestSingleton::instance().SetNum(8);
+	TestSingleton::instance().PrintNum();
 	// 게임 루프 
 	while (true) {
-		test_timer.RunTick();
+		g_test_timer.RunTick();
 		char input = GetKey();
 		HandleCommand(input);
 	}

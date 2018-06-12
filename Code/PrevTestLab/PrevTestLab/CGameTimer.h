@@ -3,8 +3,7 @@
 typedef __int64 ClockCnt;
 enum TimerType { TIMER_TYPE_TIME, TIMER_TYPE_WINDOWS};
 
-class CGameTimer sealed
-{
+class CGameTimer final {
 public:
 	CGameTimer(TimerType timer_type = TIMER_TYPE_TIME);
 	~CGameTimer();
@@ -31,3 +30,16 @@ private:
 	float elapsed_time_per_frame_;		// 프레임 당 경과 시간 (sec)
 };
 
+class CGameWorldTimer {
+private:
+	// 싱글턴 패턴
+	static CGameTimer& instance() {
+		static CGameTimer *instance = new CGameTimer(TIMER_TYPE_WINDOWS);
+		return *instance;
+	}
+	
+public:
+	float GetElapsedTimePerFrame() { return CGameWorldTimer::instance().GetElapsedTimePerFrame(); }
+	float GetCurTime() { return CGameWorldTimer::instance().GetCurTime(); }
+	float GetTotalTimeFromRun() { return CGameWorldTimer::instance().GetTotalTimeFromRun(); }
+};

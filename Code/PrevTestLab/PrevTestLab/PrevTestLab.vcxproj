@@ -144,13 +144,21 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CGameCmd.cpp" />
+    <ClCompile Include="CGameComponent.cpp" />
     <ClCompile Include="CGameFramework.cpp" />
+    <ClCompile Include="CGameObject.cpp" />
+    <ClCompile Include="CGameState.cpp" />
+    <ClCompile Include="CGameStateMachine.cpp" />
     <ClCompile Include="CGameTimer.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CGameCmd.h" />
+    <ClInclude Include="CGameComponent.h" />
     <ClInclude Include="CGameFramework.h" />
+    <ClInclude Include="CGameObject.h" />
+    <ClInclude Include="CGameState.h" />
+    <ClInclude Include="CGameStateMachine.h" />
     <ClInclude Include="CGameTimer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
