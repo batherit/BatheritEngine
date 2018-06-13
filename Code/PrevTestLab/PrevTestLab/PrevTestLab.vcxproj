@@ -150,6 +150,8 @@
     <ClCompile Include="CGameState.cpp" />
     <ClCompile Include="CGameStateMachine.cpp" />
     <ClCompile Include="CGameTimer.cpp" />
+    <ClCompile Include="CTestPerson.cpp" />
+    <ClCompile Include="CTestPersonStates.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -160,6 +162,8 @@
     <ClInclude Include="CGameState.h" />
     <ClInclude Include="CGameStateMachine.h" />
     <ClInclude Include="CGameTimer.h" />
+    <ClInclude Include="CTestPerson.h" />
+    <ClInclude Include="CTestPersonStates.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

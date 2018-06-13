@@ -8,31 +8,42 @@ template<class entity_type>
 class CGameStateMachine : public CGameComponent
 {
 public:
-	CGameStateMachine(CGameObject& r_owner)
+	CGameStateMachine(
+		CGameState<entity_type>* p_current_state,
+		CGameState<entity_type>* p_global_state = nullptr)
 		:
-		CGameComponent(r_owner),
-		p_current_state_(nullptr),
+		p_current_state_(p_current_state),
 		p_previous_state_(nullptr),
-		p_global_state_(nullptr)
-	{};
+		p_global_state_(p_global_state)
+	{
+		// 현재 상태는 보장되어야 한다.
+		assert(p_current_state_ && "<CGameStateMachine::CGameStateMachine> : tring to set to null state");
+	};
 	~CGameStateMachine() {};
 
-	void SetCurrentState(CGameState<entity_type>* p_state) { p_current_state_ = p_state; }
+	void SetCurrentState(CGameState<entity_type>* p_state) { 
+		p_current_state_ = p_state;
+		p_current_state_->p_owner_ = p_owner_;
+	}
 	void SetPreviousState(CGameState<entity_type>* p_state) { p_previous_state_ = p_state; }
-	void SetGlobalState(CGameState<entity_type>* p_state) { p_global_state_ = p_state; }
+	void SetGlobalState(CGameState<entity_type>* p_state) { 
+		p_global_state_ = p_state;
+		p_global_state_->p_owner_ = p_owner_;
+	}
 	// FSM을 갱신한다.
-	void Update() const {
-		if (p_global_state_) p_global_state_->Execute(r_owner_);
-		if (p_current_state_) p_current_state_->Execute(r_owner_);
+	void Update(float elapsed_time) {
+		if (p_global_state_) p_global_state_->Execute();
+		if (p_current_state_) p_current_state_->Execute();
 	}
 	// 새로운 상태로 변화시킨다.
 	void ChangeState(CGameState<entity_type>* p_new_state) {
 		assert(p_new_state && "<CGameStateMachine::ChangeState> : trying to change to a null state");
 		
 		p_previous_state_ = p_current_state_;
-		p_current_state_->Exit(r_owner_);
+		p_current_state_->Exit();
 		p_current_state_ = p_new_state;
-		p_current_state_->Enter(r_owner_);
+		p_current_state_->p_owner_ = p_owner_;
+		p_current_state_->Enter();
 	}
 	// 상태를 이전 상태로 다시 변화시킨다.
 	void RevertToPreviousState() {
@@ -62,8 +73,9 @@ public:
 		return s;
 	}
 
+	void Receive(int message) {}
+
 private:
-	//entity_type & r_owner_;
 	CGameState<entity_type>* p_current_state_;
 	CGameState<entity_type>* p_previous_state_;
 	CGameState<entity_type>* p_global_state_;

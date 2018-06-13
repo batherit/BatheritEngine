@@ -8,6 +8,13 @@ CGameObject::~CGameObject()
 {
 }
 
+void CGameObject::RegisterComponent(CGameComponent* p_component) {
+	if (registered_components_num_ < MAX_COMPONENTS) {
+		p_component->SetOwner(this);
+		components_[registered_components_num_++] = p_component;
+	}
+}
+
 void CGameObject::SendMessage(int message) {
 	// 피드백 루프 : CGameObject에 설정된 모든 컴포넌트에 
 	// 메시지를 보내기 위한 루프입니다.
@@ -16,6 +23,14 @@ void CGameObject::SendMessage(int message) {
 	for (int i = 0; i < MAX_COMPONENTS; i++) {
 		if (components_[i] != nullptr) {
 			components_[i]->Receive(message);
+		}
+	}
+}
+
+void CGameObject::Update(float elapsed_time) {
+	for (int i = 0; i < MAX_COMPONENTS; i++) {
+		if (components_[i] != nullptr) {
+			components_[i]->Update(elapsed_time);
 		}
 	}
 }

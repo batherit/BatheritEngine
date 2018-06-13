@@ -13,17 +13,29 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="소스 파일\Command">
-      <UniqueIdentifier>{e7e939b7-638f-4740-8d82-42274420f1b6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="소스 파일\Framework">
       <UniqueIdentifier>{810c702e-05ca-48ef-97ba-8e7a18128ba3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="소스 파일\Component">
+    <Filter Include="소스 파일\Framework\Command">
+      <UniqueIdentifier>{e7e939b7-638f-4740-8d82-42274420f1b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Framework\Component">
       <UniqueIdentifier>{9a724059-a135-43ed-8a87-1af35aee4aca}</UniqueIdentifier>
     </Filter>
-    <Filter Include="소스 파일\Component\Message">
+    <Filter Include="소스 파일\Framework\Component\Message">
       <UniqueIdentifier>{f6d4cb34-aa1c-4e21-9bf2-49344b9bc040}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Framework\Component\Abstract">
+      <UniqueIdentifier>{83b789d4-29b2-48a6-9183-149f4cb323c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\App">
+      <UniqueIdentifier>{8d71c213-3ff2-4173-b129-df9b18a1859c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\App\States">
+      <UniqueIdentifier>{694a3d0b-dfa5-466b-b9b9-f85c377645f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\App\Object">
+      <UniqueIdentifier>{1638753e-365b-46fe-93d5-2707c315f103}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -31,48 +43,60 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="CGameCmd.cpp">
-      <Filter>소스 파일\Command</Filter>
+      <Filter>소스 파일\Framework\Command</Filter>
     </ClCompile>
     <ClCompile Include="CGameTimer.cpp">
       <Filter>소스 파일\Framework</Filter>
     </ClCompile>
-    <ClCompile Include="CGameComponent.cpp">
-      <Filter>소스 파일\Component</Filter>
-    </ClCompile>
-    <ClCompile Include="CGameObject.cpp">
-      <Filter>소스 파일\Component</Filter>
-    </ClCompile>
     <ClCompile Include="CGameFramework.cpp">
       <Filter>소스 파일\Framework</Filter>
     </ClCompile>
+    <ClCompile Include="CGameComponent.cpp">
+      <Filter>소스 파일\Framework\Component\Abstract</Filter>
+    </ClCompile>
+    <ClCompile Include="CGameObject.cpp">
+      <Filter>소스 파일\Framework\Component\Abstract</Filter>
+    </ClCompile>
     <ClCompile Include="CGameState.cpp">
-      <Filter>소스 파일\Component</Filter>
+      <Filter>소스 파일\Framework\Component\Abstract</Filter>
     </ClCompile>
     <ClCompile Include="CGameStateMachine.cpp">
-      <Filter>소스 파일\Component</Filter>
+      <Filter>소스 파일\Framework\Component\Abstract</Filter>
+    </ClCompile>
+    <ClCompile Include="CTestPersonStates.cpp">
+      <Filter>소스 파일\App\States</Filter>
+    </ClCompile>
+    <ClCompile Include="CTestPerson.cpp">
+      <Filter>소스 파일\App\Object</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CGameCmd.h">
-      <Filter>소스 파일\Command</Filter>
+      <Filter>소스 파일\Framework\Command</Filter>
     </ClInclude>
     <ClInclude Include="CGameTimer.h">
       <Filter>소스 파일\Framework</Filter>
     </ClInclude>
-    <ClInclude Include="CGameComponent.h">
-      <Filter>소스 파일\Component</Filter>
-    </ClInclude>
-    <ClInclude Include="CGameObject.h">
-      <Filter>소스 파일\Component</Filter>
-    </ClInclude>
     <ClInclude Include="CGameFramework.h">
       <Filter>소스 파일\Framework</Filter>
     </ClInclude>
+    <ClInclude Include="CGameComponent.h">
+      <Filter>소스 파일\Framework\Component\Abstract</Filter>
+    </ClInclude>
+    <ClInclude Include="CGameObject.h">
+      <Filter>소스 파일\Framework\Component\Abstract</Filter>
+    </ClInclude>
     <ClInclude Include="CGameState.h">
-      <Filter>소스 파일\Component</Filter>
+      <Filter>소스 파일\Framework\Component\Abstract</Filter>
     </ClInclude>
     <ClInclude Include="CGameStateMachine.h">
-      <Filter>소스 파일\Component</Filter>
+      <Filter>소스 파일\Framework\Component\Abstract</Filter>
+    </ClInclude>
+    <ClInclude Include="CTestPersonStates.h">
+      <Filter>소스 파일\App\States</Filter>
+    </ClInclude>
+    <ClInclude Include="CTestPerson.h">
+      <Filter>소스 파일\App\Object</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

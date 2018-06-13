@@ -2,14 +2,17 @@
 #include"CGameComponent.h"
 
 template<class entity_type>
-class CGameState : public CGameComponent
+class CGameState
 {
 public:
-	CGameState(CGameObject& r_owner) : CGameComponent(r_owner) {};
-	virtual ~CGameState();
+	CGameState() : p_owner_(nullptr) {}
+	virtual ~CGameState() {}
 
-	virtual void Enter(entity_type&) = 0;
- 	virtual void Execute(entity_type&) = 0;
-	virtual void Exit(entity_type&) = 0;
+	virtual void Enter(void) = 0;
+ 	virtual void Execute(void) = 0;
+	virtual void Exit(void) = 0;
+
+protected:
+	entity_type * p_owner_;
 };
 

@@ -1,13 +1,21 @@
 #pragma once
+#include<cstring>
 class CGameComponent;
 
+// CGameObject는 상속을 받지 아니하여도 되지만
+// 상태 컴포넌트를 소유하게 될 경우, 상속하여 상태를 나타내는
+// 변수들을 선언하여야 합니다.
 class CGameObject
 {
 public:
-	CGameObject(int ID) { SetID(ID); }
+	CGameObject(int ID) : registered_components_num_(0) { 
+		SetID(ID);
+		memset(components_, '\0', sizeof(components_));
+	}
 	virtual ~CGameObject();
 
 	int GetID() const { return ID_; }
+	void RegisterComponent(CGameComponent* p_component);
 	void SendMessage(int message);	// 외부/내부 메시지
 	void Update(float elapsed_time);
 
@@ -17,6 +25,7 @@ private:
 
 	static const int MAX_COMPONENTS = 10;
 	CGameComponent* components_[MAX_COMPONENTS];
+	int registered_components_num_;
 
 	void SetID(int ID);
 };
