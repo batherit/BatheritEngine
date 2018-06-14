@@ -11,7 +11,7 @@ public:
 	virtual void Receive(int message) = 0;	// 브로드 캐스트 방식 통신
 	virtual void Update(float elapsed_time) = 0;
 
-private:
+protected:
 	CGameObject* p_owner_;
 };
 

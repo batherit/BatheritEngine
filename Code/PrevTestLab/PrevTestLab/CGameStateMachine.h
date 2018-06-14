@@ -18,17 +18,21 @@ public:
 	{
 		// 현재 상태는 보장되어야 한다.
 		assert(p_current_state_ && "<CGameStateMachine::CGameStateMachine> : tring to set to null state");
+		SetCurrentState(p_current_state);
+		SetGlobalState(p_global_state);
 	};
 	~CGameStateMachine() {};
 
 	void SetCurrentState(CGameState<entity_type>* p_state) { 
 		p_current_state_ = p_state;
-		p_current_state_->p_owner_ = p_owner_;
+		p_current_state_->p_owner_ = dynamic_cast<entity_type*>(p_owner_);
+		p_current_state_->p_state_machine_ = this;
 	}
 	void SetPreviousState(CGameState<entity_type>* p_state) { p_previous_state_ = p_state; }
 	void SetGlobalState(CGameState<entity_type>* p_state) { 
 		p_global_state_ = p_state;
-		p_global_state_->p_owner_ = p_owner_;
+		p_global_state_->p_owner_ = dynamic_cast<entity_type*>(p_owner_); 
+		p_global_state_->p_state_machine_ = this;
 	}
 	// FSM을 갱신한다.
 	void Update(float elapsed_time) {
@@ -42,7 +46,8 @@ public:
 		p_previous_state_ = p_current_state_;
 		p_current_state_->Exit();
 		p_current_state_ = p_new_state;
-		p_current_state_->p_owner_ = p_owner_;
+		p_current_state_->p_owner_= dynamic_cast<entity_type*>(p_owner_);
+		p_current_state_->p_state_machine_ = this;
 		p_current_state_->Enter();
 	}
 	// 상태를 이전 상태로 다시 변화시킨다.

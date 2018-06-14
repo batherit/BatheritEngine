@@ -10,11 +10,12 @@ using namespace std;
 
 CGameTimer g_test_timer(TIMER_TYPE_WINDOWS);
 #define IDLE_STATE IDLE::Instance()
+#define GLOBAL_STATE CTestPersonGlobalState::Instance()
 
 int main(void) {
 	CTestPerson test_object(0);
 	test_object.RegisterComponent(
-		new CGameStateMachine<CTestPerson>(IDLE_STATE));
+		new CGameStateMachine<CTestPerson>(IDLE_STATE, GLOBAL_STATE));
 
 	
 	// 게임 루프 

@@ -2,10 +2,16 @@
 #include"CGameComponent.h"
 
 template<class entity_type>
+class CGameStateMachine;
+
+template<class entity_type>
 class CGameState
 {
+	template<class entity_type>
+	friend class CGameStateMachine;
+
 public:
-	CGameState() : p_owner_(nullptr) {}
+	CGameState() : p_owner_(nullptr), p_state_machine_(nullptr) {}
 	virtual ~CGameState() {}
 
 	virtual void Enter(void) = 0;
@@ -14,5 +20,6 @@ public:
 
 protected:
 	entity_type * p_owner_;
+	CGameStateMachine<entity_type>* p_state_machine_;
 };
 
