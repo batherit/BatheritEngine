@@ -22,9 +22,6 @@
     <Filter Include="소스 파일\Framework\Component">
       <UniqueIdentifier>{9a724059-a135-43ed-8a87-1af35aee4aca}</UniqueIdentifier>
     </Filter>
-    <Filter Include="소스 파일\Framework\Component\Message">
-      <UniqueIdentifier>{f6d4cb34-aa1c-4e21-9bf2-49344b9bc040}</UniqueIdentifier>
-    </Filter>
     <Filter Include="소스 파일\Framework\Component\Abstract">
       <UniqueIdentifier>{83b789d4-29b2-48a6-9183-149f4cb323c0}</UniqueIdentifier>
     </Filter>
@@ -36,6 +33,9 @@
     </Filter>
     <Filter Include="소스 파일\App\Object">
       <UniqueIdentifier>{1638753e-365b-46fe-93d5-2707c315f103}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Framework\Component\TelegramSystem">
+      <UniqueIdentifier>{f6d4cb34-aa1c-4e21-9bf2-49344b9bc040}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -69,6 +69,15 @@
     <ClCompile Include="CTestPerson.cpp">
       <Filter>소스 파일\App\Object</Filter>
     </ClCompile>
+    <ClCompile Include="CGameTelegram.cpp">
+      <Filter>소스 파일\Framework\Component\TelegramSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="CGameMessageDispatcher.cpp">
+      <Filter>소스 파일\Framework\Component\TelegramSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="CGameObjectManager.cpp">
+      <Filter>소스 파일\Framework\Component\Abstract</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CGameCmd.h">
@@ -97,6 +106,15 @@
     </ClInclude>
     <ClInclude Include="CTestPerson.h">
       <Filter>소스 파일\App\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="CGameTelegram.h">
+      <Filter>소스 파일\Framework\Component\TelegramSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="CGameMessageDispatcher.h">
+      <Filter>소스 파일\Framework\Component\TelegramSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="CGameObjectManager.h">
+      <Filter>소스 파일\Framework\Component\Abstract</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

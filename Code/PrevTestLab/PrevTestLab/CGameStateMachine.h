@@ -78,7 +78,22 @@ public:
 		return s;
 	}
 
-	void Receive(int message) {}
+	void Receive(const Telegram& r_msg) {
+		// 우선 현재 상태가 유효하고 메시지를 처리할 수 있는지를 알아본다.
+		if (p_current_state_ && p_current_state_->OnMessage(dynamic_cast<entity_type*>(p_owner_), r_msg))
+		{
+			return;
+		}
+
+		// 처리할 수 없고 전역 상태가 설치되어 있다면, 메시지를 전역 상태로 보낸다.
+		// => 어떤 상태에서든 반응해야만 하는 메시지이다.
+		if (p_global_state_ && p_current_state_->OnMessage(dynamic_cast<entity_type*>(p_owner_), r_msg))
+		{
+			return;
+		}
+
+		return;
+	}
 
 private:
 	CGameState<entity_type>* p_current_state_;

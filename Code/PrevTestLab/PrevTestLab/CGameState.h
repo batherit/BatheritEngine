@@ -1,6 +1,7 @@
 #pragma once
 #include"CGameComponent.h"
 
+struct Telegram;
 template<class entity_type>
 class CGameStateMachine;
 
@@ -17,6 +18,8 @@ public:
 	virtual void Enter(void) = 0;
  	virtual void Execute(void) = 0;
 	virtual void Exit(void) = 0;
+
+	virtual bool OnMessage(entity_type*, const  Telegram&) = 0;
 
 protected:
 	entity_type * p_owner_;

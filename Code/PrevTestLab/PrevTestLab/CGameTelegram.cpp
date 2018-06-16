@@ -1,0 +1,1 @@
+#include "CGameTelegram.h"

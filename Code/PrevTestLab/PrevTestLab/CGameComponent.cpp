@@ -5,8 +5,8 @@ CGameComponent::~CGameComponent()
 {
 }
 
-void CGameComponent::Send(int message) {
-	if(p_owner_) p_owner_->SendMessage(message);
+void CGameComponent::SendMessage(const Telegram& r_msg) {
+	if(p_owner_) p_owner_->SendMessage(r_msg);
 }
 
 void CGameComponent::SetOwner(CGameObject* p_owner) {

@@ -1,5 +1,7 @@
 #pragma once
 #include<cstring>
+#include"CGameTelegram.h"
+#include"CGameObjectManager.h"
 class CGameComponent;
 
 // CGameObject는 상속을 받지 아니하여도 되지만
@@ -11,12 +13,14 @@ public:
 	CGameObject(int ID) : registered_components_num_(0) { 
 		SetID(ID);
 		memset(components_, '\0', sizeof(components_));
+		// 게임 객체는 생성되면 자동으로 게임 객체 관리자에 등록된다.
+		GameObjectMgr->RegisterObject(this);
 	}
 	virtual ~CGameObject();
 
 	int GetID() const { return ID_; }
 	void RegisterComponent(CGameComponent* p_component);
-	void SendMessage(int message);	// 외부/내부 메시지
+	void SendMessage(const Telegram& r_msg);	// 외부/내부 메시지
 	void Update(float elapsed_time);
 
 private:

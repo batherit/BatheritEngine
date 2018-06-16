@@ -1,16 +1,10 @@
 #include<iostream> 
-#include<conio.h> 
 #include"CGameTimer.h"
-#include"CGameObject.h"
-#include"CGameStateMachine.h"
-#include"CGameState.h"
 #include"CTestPerson.h"
 #include"CTestPersonStates.h"
 using namespace std;
 
 CGameTimer g_test_timer(TIMER_TYPE_WINDOWS);
-#define IDLE_STATE IDLE::Instance()
-#define GLOBAL_STATE CTestPersonGlobalState::Instance()
 
 int main(void) {
 	CTestPerson test_object(0);
