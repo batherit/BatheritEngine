@@ -3,7 +3,7 @@
 #include<cmath>
 
 #define SMALLEST_DELAY_TIME	0.25f	// 고주파의 메시지 발생을 보이는 게임은 더 작은 값을 가질 것이다.
-enum MESSAGE_CONTENT;		// 실질적인 내용은 "CGameMessageContent.h"에 정의
+enum MESSAGE_CONTENT {};		// 실질적인 내용은 "CGameMessageContent.h"에 정의
 
 struct Telegram {
 	int sender_ID;			// 송신자 아이디

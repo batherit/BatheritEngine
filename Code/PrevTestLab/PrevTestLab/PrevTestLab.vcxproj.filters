@@ -37,6 +37,21 @@
     <Filter Include="소스 파일\Framework\Component\TelegramSystem">
       <UniqueIdentifier>{f6d4cb34-aa1c-4e21-9bf2-49344b9bc040}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\Framework\Component\Child">
+      <UniqueIdentifier>{19816bad-1b35-429d-bab1-b7ddd38aef1f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Framework\Util">
+      <UniqueIdentifier>{549a08d8-a6a7-4c7c-adbe-31d2f913862e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Framework\Util\MathUtil">
+      <UniqueIdentifier>{bc1c0424-6815-42c1-9061-e7db53af785a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Framework\Component\Child\ToolComponent">
+      <UniqueIdentifier>{f0c8b263-2f82-4c57-8d81-986849fe4f6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Framework\World">
+      <UniqueIdentifier>{9169b671-d751-4769-a07b-55eaacc6929f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -78,6 +93,30 @@
     <ClCompile Include="CGameObjectManager.cpp">
       <Filter>소스 파일\Framework\Component\Abstract</Filter>
     </ClCompile>
+    <ClCompile Include="CPhysicsComponent.cpp">
+      <Filter>소스 파일\Framework\Component\Child</Filter>
+    </ClCompile>
+    <ClCompile Include="CTransformComponent.cpp">
+      <Filter>소스 파일\Framework\Component\Child</Filter>
+    </ClCompile>
+    <ClCompile Include="CVector2D.cpp">
+      <Filter>소스 파일\Framework\Util\MathUtil</Filter>
+    </ClCompile>
+    <ClCompile Include="CUtil.cpp">
+      <Filter>소스 파일\Framework\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="CMathUtil.cpp">
+      <Filter>소스 파일\Framework\Util\MathUtil</Filter>
+    </ClCompile>
+    <ClCompile Include="CVehicle.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="CGameWorld.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="C2DMatrix.cpp">
+      <Filter>소스 파일\Framework\Util\MathUtil</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CGameCmd.h">
@@ -115,6 +154,30 @@
     </ClInclude>
     <ClInclude Include="CGameObjectManager.h">
       <Filter>소스 파일\Framework\Component\Abstract</Filter>
+    </ClInclude>
+    <ClInclude Include="CPhysicsComponent.h">
+      <Filter>소스 파일\Framework\Component\Child</Filter>
+    </ClInclude>
+    <ClInclude Include="CTransformComponent.h">
+      <Filter>소스 파일\Framework\Component\Child</Filter>
+    </ClInclude>
+    <ClInclude Include="CVector2D.h">
+      <Filter>소스 파일\Framework\Util\MathUtil</Filter>
+    </ClInclude>
+    <ClInclude Include="CUtil.h">
+      <Filter>소스 파일\Framework\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="CMathUtil.h">
+      <Filter>소스 파일\Framework\Util\MathUtil</Filter>
+    </ClInclude>
+    <ClInclude Include="CVehicle.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="CGameWorld.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="C2DMatrix.h">
+      <Filter>소스 파일\Framework\Util\MathUtil</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -143,6 +143,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="C2DMatrix.cpp" />
     <ClCompile Include="CGameCmd.cpp" />
     <ClCompile Include="CGameComponent.cpp" />
     <ClCompile Include="CGameFramework.cpp" />
@@ -153,11 +154,19 @@
     <ClCompile Include="CGameStateMachine.cpp" />
     <ClCompile Include="CGameTelegram.cpp" />
     <ClCompile Include="CGameTimer.cpp" />
+    <ClCompile Include="CGameWorld.cpp" />
+    <ClCompile Include="CMathUtil.cpp" />
+    <ClCompile Include="CPhysicsComponent.cpp" />
     <ClCompile Include="CTestPerson.cpp" />
     <ClCompile Include="CTestPersonStates.cpp" />
+    <ClCompile Include="CTransformComponent.cpp" />
+    <ClCompile Include="CUtil.cpp" />
+    <ClCompile Include="CVector2D.cpp" />
+    <ClCompile Include="CVehicle.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="C2DMatrix.h" />
     <ClInclude Include="CGameCmd.h" />
     <ClInclude Include="CGameComponent.h" />
     <ClInclude Include="CGameFramework.h" />
@@ -168,8 +177,15 @@
     <ClInclude Include="CGameStateMachine.h" />
     <ClInclude Include="CGameTelegram.h" />
     <ClInclude Include="CGameTimer.h" />
+    <ClInclude Include="CGameWorld.h" />
+    <ClInclude Include="CMathUtil.h" />
+    <ClInclude Include="CPhysicsComponent.h" />
     <ClInclude Include="CTestPerson.h" />
     <ClInclude Include="CTestPersonStates.h" />
+    <ClInclude Include="CTransformComponent.h" />
+    <ClInclude Include="CUtil.h" />
+    <ClInclude Include="CVector2D.h" />
+    <ClInclude Include="CVehicle.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

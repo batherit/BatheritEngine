@@ -2,6 +2,9 @@
 #include<cstring>
 #include"CGameTelegram.h"
 #include"CGameObjectManager.h"
+#include"CTransformComponent.h"
+#include"CGameWorld.h"
+
 class CGameComponent;
 
 // CGameObject는 상속을 받지 아니하여도 되지만
@@ -10,6 +13,8 @@ class CGameComponent;
 class CGameObject
 {
 public:
+	CTransformComponent transform_;
+
 	CGameObject(int ID) : registered_components_num_(0) { 
 		SetID(ID);
 		memset(components_, '\0', sizeof(components_));
@@ -24,9 +29,11 @@ public:
 	void Update(float elapsed_time);
 
 private:
+	CGameWorld playground_;
+
 	int ID_;						// 모든 엔티티들은 고유한 식별 번호를 갖는다.
 	static int next_valid_ID_;		// 이것은 유효한 다음 식별 번호이다.
-
+	
 	static const int MAX_COMPONENTS = 10;
 	CGameComponent* components_[MAX_COMPONENTS];
 	int registered_components_num_;

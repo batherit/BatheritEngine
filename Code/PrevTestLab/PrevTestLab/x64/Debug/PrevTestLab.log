@@ -1,6 +1,15 @@
-﻿  CGameState.cpp
-  CGameStateMachine.cpp
+﻿  C2DMatrix.cpp
+  CGameComponent.cpp
+  CGameFramework.cpp
+  CGameMessageDispatcher.cpp
+  CGameObject.cpp
+  CGameObjectManager.cpp
+  CMathUtil.cpp
+  CPhysicsComponent.cpp
+  CTestPerson.cpp
   CTestPersonStates.cpp
+  CTransformComponent.cpp
+  CVector2D.cpp
   main.cpp
   코드를 생성하고 있습니다...
   PrevTestLab.vcxproj -> D:\My Lab\GameLab\GameEngine\BatheritEngine\Code\PrevTestLab\x64\Debug\PrevTestLab.exe
