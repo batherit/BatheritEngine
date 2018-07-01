@@ -1,21 +1,30 @@
 #pragma once
+#include"CUtil.h"
 #include"CGameTimer.h"
+#include"CGameWorld.h"
 #include"CGameObject.h"
 
 class CGameFramework
 {
 public:
-	CGameFramework();
-	~CGameFramework();
+	CGameFramework() { main_timer_ = new CGameTimer(TIMER_TYPE_WINDOWS); }
+	virtual ~CGameFramework() { Release(); }
 
-	void Run(void);
-	void Release(void);
-
+	virtual void Init() = 0;
+	void Run(void) { 
+		while (true) {
+			main_timer_->RunTick();
+			Update(main_timer_->GetElapsedTimePerFrame());
+			Render(main_timer_->GetElapsedTimePerFrame());
+		}
+	}
+	
 protected:
-	void Update(void);
-	void Render(void);
+	virtual void Update(float tick) = 0;
+	virtual void Render(float tick) = 0;
 
 private:
-	CGameTimer main_timer_;
+	void Release(void) { if (!main_timer_) delete main_timer_; }
+	
+	CGameTimer* main_timer_;
 };
-

@@ -129,3 +129,69 @@ inline CVector2D CVector2D::Perp() const {
 	return CVector2D(-y_, x_);
 }
 
+inline void CVector2D::Truncate(float max) {
+	if (this->Length() > max)
+	{
+		this->Normalize();
+
+		*this *= max;
+	}
+}
+
+inline float CVector2D::Distance(const CVector2D &v2) const {
+	float ySeparation = v2.y_ - y_;
+	float xSeparation = v2.x_ - x_;
+
+	return sqrt(ySeparation*ySeparation + xSeparation * xSeparation);
+}
+
+inline float CVector2D::DistanceSq(const CVector2D& v2) const {
+	float ySeparation = v2.y_ - y_;
+	float xSeparation = v2.x_ - x_;
+
+	return ySeparation * ySeparation + xSeparation * xSeparation;
+}
+
+inline void CVector2D::Reflect(const CVector2D& norm) {
+	*this += 2.0 * this->Dot(norm) * norm.GetReverse();
+}
+
+inline CVector2D CVector2D::GetReverse() const {
+	return CVector2D(-this->x_, -this->y_);
+}
+
+inline CVector2D operator*(const CVector2D &lhs, float rhs) {
+	CVector2D result(lhs);
+	result *= rhs;
+	return result;
+}
+
+inline CVector2D operator*(float lhs, const CVector2D &rhs) {
+	CVector2D result(rhs);
+	result *= lhs;
+	return result;
+}
+
+inline CVector2D operator-(const CVector2D &lhs, const CVector2D &rhs) {
+	CVector2D result(lhs);
+	result.x_ -= rhs.x_;
+	result.y_ -= rhs.y_;
+
+	return result;
+}
+
+inline CVector2D operator+(const CVector2D &lhs, const CVector2D &rhs) {
+	CVector2D result(lhs);
+	result.x_ += rhs.x_;
+	result.y_ += rhs.y_;
+
+	return result;
+}
+
+inline CVector2D operator/(const CVector2D &lhs, float val) {
+	CVector2D result(lhs);
+	result.x_ /= val;
+	result.y_ /= val;
+
+	return result;
+}

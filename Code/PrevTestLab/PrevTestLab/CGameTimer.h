@@ -30,16 +30,20 @@ private:
 	float elapsed_time_per_frame_;		// 프레임 당 경과 시간 (sec)
 };
 
+#define WorldTimer	CGameWorldTimer::Instance()
+
 class CGameWorldTimer {
 private:
 	// 싱글턴 패턴
-	static CGameTimer& instance() {
-		static CGameTimer *instance = new CGameTimer(TIMER_TYPE_WINDOWS);
+	
+	static CGameWorldTimer& instance() {
+		static CGameWorldTimer *instance = new CGameWorldTimer();
 		return *instance;
 	}
-	
+
+	static CGameTimer world_timer_;
 public:
-	float GetElapsedTimePerFrame() { return CGameWorldTimer::instance().GetElapsedTimePerFrame(); }
-	float GetCurTime() { return CGameWorldTimer::instance().GetCurTime(); }
-	float GetTotalTimeFromRun() { return CGameWorldTimer::instance().GetTotalTimeFromRun(); }
+	float GetElapsedTimePerFrame() { return world_timer_.GetElapsedTimePerFrame();}
+	float GetCurTime() { return world_timer_.GetCurTime(); }
+	float GetTotalTimeFromRun() { return world_timer_.GetTotalTimeFromRun(); }
 };

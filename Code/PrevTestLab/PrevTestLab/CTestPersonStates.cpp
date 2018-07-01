@@ -1,11 +1,6 @@
 #include "CTestPersonStates.h"
 #include "CTestPerson.h"
 #include <iostream>
-#include <cstdlib>
-#include<ctime>
-
-#define DEFINE_RAND_SEED srand(time(nullptr));
-inline double RandFloat() { return ((rand()) / (RAND_MAX + 1.0)); }
 
 CTestPersonGlobalState* CTestPersonGlobalState::Instance() {
 	static CTestPersonGlobalState instance;

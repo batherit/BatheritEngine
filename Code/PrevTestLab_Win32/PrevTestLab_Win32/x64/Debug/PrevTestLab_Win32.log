@@ -1,0 +1,17 @@
+﻿  stdafx.cpp
+  CGameComponent.cpp
+  CGameFramework.cpp
+  CGameMessageDispatcher.cpp
+  CGameObject.cpp
+  CGameObjectManager.cpp
+  CGameWorld.cpp
+  CPhysicsComponent.cpp
+  CSteeringBehaviors.cpp
+  CTestFramework.cpp
+  CTestPerson.cpp
+  CTestPersonStates.cpp
+  CVehicle.cpp
+  CWall2D.cpp
+  PrevTestLab_Win32.cpp
+  코드를 생성하고 있습니다...
+  PrevTestLab_Win32.vcxproj -> D:\My Lab\GameLab\GameEngine\BatheritEngine\Code\PrevTestLab_Win32\x64\Debug\PrevTestLab_Win32.exe

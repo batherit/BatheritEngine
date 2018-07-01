@@ -157,13 +157,21 @@
     <ClCompile Include="CGameWorld.cpp" />
     <ClCompile Include="CMathUtil.cpp" />
     <ClCompile Include="CPhysicsComponent.cpp" />
+    <ClCompile Include="CSteeringBehaviors.cpp" />
+    <ClCompile Include="CTestFramework.cpp" />
     <ClCompile Include="CTestPerson.cpp" />
     <ClCompile Include="CTestPersonStates.cpp" />
     <ClCompile Include="CTransformComponent.cpp" />
     <ClCompile Include="CUtil.cpp" />
     <ClCompile Include="CVector2D.cpp" />
     <ClCompile Include="CVehicle.cpp" />
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="CWindowsUtil.cpp" />
+    <ClCompile Include="main_DOS.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="main_WINDOWS.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C2DMatrix.h" />
@@ -180,12 +188,15 @@
     <ClInclude Include="CGameWorld.h" />
     <ClInclude Include="CMathUtil.h" />
     <ClInclude Include="CPhysicsComponent.h" />
+    <ClInclude Include="CSteeringBehaviors.h" />
+    <ClInclude Include="CTestFramework.h" />
     <ClInclude Include="CTestPerson.h" />
     <ClInclude Include="CTestPersonStates.h" />
     <ClInclude Include="CTransformComponent.h" />
     <ClInclude Include="CUtil.h" />
     <ClInclude Include="CVector2D.h" />
     <ClInclude Include="CVehicle.h" />
+    <ClInclude Include="CWindowsUtil.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

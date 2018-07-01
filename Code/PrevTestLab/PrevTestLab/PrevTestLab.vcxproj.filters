@@ -52,11 +52,14 @@
     <Filter Include="소스 파일\Framework\World">
       <UniqueIdentifier>{9169b671-d751-4769-a07b-55eaacc6929f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\App\Framework">
+      <UniqueIdentifier>{2fcca556-d72a-4a26-b042-fe28a64855c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Framework\Util\WindowsUtil">
+      <UniqueIdentifier>{474f15b0-7390-4e77-b53c-cefbd38a600c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="CGameCmd.cpp">
       <Filter>소스 파일\Framework\Command</Filter>
     </ClCompile>
@@ -108,14 +111,29 @@
     <ClCompile Include="CMathUtil.cpp">
       <Filter>소스 파일\Framework\Util\MathUtil</Filter>
     </ClCompile>
-    <ClCompile Include="CVehicle.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="CGameWorld.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="C2DMatrix.cpp">
       <Filter>소스 파일\Framework\Util\MathUtil</Filter>
+    </ClCompile>
+    <ClCompile Include="CGameWorld.cpp">
+      <Filter>소스 파일\Framework\World</Filter>
+    </ClCompile>
+    <ClCompile Include="CVehicle.cpp">
+      <Filter>소스 파일\Framework\Component\Child\ToolComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="CSteeringBehaviors.cpp">
+      <Filter>소스 파일\Framework\Component\Child\ToolComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="CTestFramework.cpp">
+      <Filter>소스 파일\App\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="main_DOS.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="main_WINDOWS.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="CWindowsUtil.cpp">
+      <Filter>소스 파일\Framework\Util\WindowsUtil</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -170,14 +188,23 @@
     <ClInclude Include="CMathUtil.h">
       <Filter>소스 파일\Framework\Util\MathUtil</Filter>
     </ClInclude>
-    <ClInclude Include="CVehicle.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="CGameWorld.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="C2DMatrix.h">
       <Filter>소스 파일\Framework\Util\MathUtil</Filter>
+    </ClInclude>
+    <ClInclude Include="CGameWorld.h">
+      <Filter>소스 파일\Framework\World</Filter>
+    </ClInclude>
+    <ClInclude Include="CVehicle.h">
+      <Filter>소스 파일\Framework\Component\Child\ToolComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="CSteeringBehaviors.h">
+      <Filter>소스 파일\Framework\Component\Child\ToolComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="CTestFramework.h">
+      <Filter>소스 파일\App\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="CWindowsUtil.h">
+      <Filter>소스 파일\Framework\Util\WindowsUtil</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

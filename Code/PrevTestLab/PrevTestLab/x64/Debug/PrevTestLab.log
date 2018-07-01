@@ -4,12 +4,23 @@
   CGameMessageDispatcher.cpp
   CGameObject.cpp
   CGameObjectManager.cpp
+  CGameState.cpp
+  CGameStateMachine.cpp
+  CGameTelegram.cpp
+  CGameTimer.cpp
   CMathUtil.cpp
   CPhysicsComponent.cpp
+  CSteeringBehaviors.cpp
+  CTestFramework.cpp
   CTestPerson.cpp
   CTestPersonStates.cpp
   CTransformComponent.cpp
+  CUtil.cpp
   CVector2D.cpp
-  main.cpp
+  CVehicle.cpp
   코드를 생성하고 있습니다...
+  컴파일하고 있습니다...
+  CWindowsUtil.cpp
+  코드를 생성하고 있습니다...
+  main_DOS.cpp
   PrevTestLab.vcxproj -> D:\My Lab\GameLab\GameEngine\BatheritEngine\Code\PrevTestLab\x64\Debug\PrevTestLab.exe
