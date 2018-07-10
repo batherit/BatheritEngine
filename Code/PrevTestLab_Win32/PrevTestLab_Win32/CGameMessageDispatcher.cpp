@@ -9,7 +9,7 @@ CGameMessageDispatcher* CGameMessageDispatcher::Instance() {
 	return &instance;
 }
 
-void CGameMessageDispatcher::DispatchMessage(float delay, int sender_ID, int receiver_ID, MESSAGE_CONTENT msg, void* p_extra_info) {
+void CGameMessageDispatcher::DispatchMessageToQueue(float delay, int sender_ID, int receiver_ID, MESSAGE_CONTENT msg, void* p_extra_info) {
 	CGameObject* p_sender	= GameObjectMgr->GetObjectFromID(sender_ID);
 	CGameObject* p_receiver = GameObjectMgr->GetObjectFromID(receiver_ID);
 
@@ -64,5 +64,5 @@ void CGameMessageDispatcher::DispatchDelayedMessages(float delay, int sender_ID,
 }
 
 void CGameMessageDispatcher::Discharge(CGameObject* p_receiver, const Telegram& r_t) {
-	p_receiver->SendMessage(r_t);
+	p_receiver->SendMessageToComponents(r_t);
 }

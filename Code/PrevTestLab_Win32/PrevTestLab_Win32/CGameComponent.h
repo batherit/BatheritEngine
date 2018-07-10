@@ -13,7 +13,7 @@ public:
 	virtual void Update(float elapsed_time) = 0;		// SendMessage 호출 가능, CGameObject가 호출
 
 protected:
-	void SendMessage(const Telegram& r_msg);
+	void FeedbackToObject(const Telegram& r_msg);
 	CGameObject* p_owner_;
 };
 

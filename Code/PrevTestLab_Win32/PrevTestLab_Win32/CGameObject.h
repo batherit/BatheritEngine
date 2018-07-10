@@ -27,7 +27,7 @@ public:
 
 	int GetID() const { return ID_; }
 	void RegisterComponent(CGameComponent* p_component);
-	void SendMessage(const Telegram& r_msg);	// 외부/내부 메시지
+	void SendMessageToComponents(const Telegram& r_msg);	// 외부/내부 메시지
 	void Update(float elapsed_time);
 
 private:

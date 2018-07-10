@@ -167,6 +167,9 @@
     <ClInclude Include="CVector2D.h" />
     <ClInclude Include="CVehicle.h" />
     <ClInclude Include="CWall2D.h" />
+    <ClInclude Include="CWin32GDI.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="CWindowsUtil.h" />
     <ClInclude Include="PrevTestLab_Win32.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -206,6 +209,9 @@
     <ClCompile Include="CVector2D.cpp" />
     <ClCompile Include="CVehicle.cpp" />
     <ClCompile Include="CWall2D.cpp" />
+    <ClCompile Include="CWin32GDI.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="CWindowsUtil.cpp" />
     <ClCompile Include="main_DOS.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>

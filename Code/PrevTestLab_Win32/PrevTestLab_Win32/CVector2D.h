@@ -1,6 +1,7 @@
 #pragma once
 #include<iostream>
 #include<limits>
+#include<windows.h>
 #include"CCommonUtil.h"
 
 class CVector2D
@@ -158,6 +159,15 @@ inline void CVector2D::Reflect(const CVector2D& norm) {
 
 inline CVector2D CVector2D::GetReverse() const {
 	return CVector2D(-this->x_, -this->y_);
+}
+
+inline POINT VectorToPOINT(const CVector2D& v)
+{
+	POINT p;
+	p.x = (long)v.x_;
+	p.y = (long)v.y_;
+
+	return p;
 }
 
 inline CVector2D operator*(const CVector2D &lhs, float rhs) {
