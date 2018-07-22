@@ -108,6 +108,15 @@
     <ClInclude Include="CWin32GDI.h">
       <Filter>소스 파일\Framework</Filter>
     </ClInclude>
+    <ClInclude Include="CWIn32RenderComponent.h">
+      <Filter>소스 파일\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="CGeometryGenerator.h">
+      <Filter>소스 파일\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="CRenderComponent.h">
+      <Filter>소스 파일\Framework</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -198,6 +207,15 @@
       <Filter>소스 파일\Framework</Filter>
     </ClCompile>
     <ClCompile Include="CWin32GDI.cpp">
+      <Filter>소스 파일\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="CWIn32RenderComponent.cpp">
+      <Filter>소스 파일\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="CGeometryGenerator.cpp">
+      <Filter>소스 파일\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="CRenderComponent.cpp">
       <Filter>소스 파일\Framework</Filter>
     </ClCompile>
   </ItemGroup>

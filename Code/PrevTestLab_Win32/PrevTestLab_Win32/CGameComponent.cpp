@@ -10,5 +10,5 @@ void CGameComponent::FeedbackToObject(const Telegram& r_msg) {
 }
 
 void CGameComponent::SetOwner(CGameObject* p_owner) {
-	p_owner_ = p_owner_;
+	p_owner_ = p_owner;
 }

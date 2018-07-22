@@ -205,3 +205,14 @@ inline CVector2D operator/(const CVector2D &lhs, float val) {
 
 	return result;
 }
+
+inline void WrapAround(CVector2D &pos, int MaxX, int MaxY)
+{
+	if (pos.x_ > MaxX) { pos.x_ = 0.0; }
+
+	if (pos.x_ < 0) { pos.x_ = (float)MaxX; }
+
+	if (pos.y_ < 0) { pos.y_ = (float)MaxY; }
+
+	if (pos.y_ > MaxY) { pos.y_ = 0.0; }
+}

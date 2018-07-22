@@ -1,6 +1,8 @@
+#include<cassert>
 #include "CGameObject.h"
 #include "CGameComponent.h"
-#include<cassert>
+#include "CRenderComponent.h"
+
 
 int CGameObject::next_valid_ID_ = 0;
 
@@ -13,6 +15,11 @@ void CGameObject::RegisterComponent(CGameComponent* p_component) {
 		p_component->SetOwner(this);
 		components_[registered_components_num_++] = p_component;
 	}
+}
+
+void CGameObject::RegisterRenderComponent(CRenderComponent* p_component) {
+	p_component->SetOwner(this);
+	renderer_ = p_component;
 }
 
 void CGameObject::SendMessageToComponents(const Telegram& r_msg) {
@@ -33,6 +40,10 @@ void CGameObject::Update(float elapsed_time) {
 			components_[i]->Update(elapsed_time);
 		}
 	}
+}
+
+void CGameObject::Render(void) {
+	if(renderer_) renderer_->Render();
 }
 
 void CGameObject::SetID(int ID) {

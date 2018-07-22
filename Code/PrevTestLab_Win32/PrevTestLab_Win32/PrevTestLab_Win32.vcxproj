@@ -156,8 +156,10 @@
     <ClInclude Include="CGameTelegram.h" />
     <ClInclude Include="CGameTimer.h" />
     <ClInclude Include="CGameWorld.h" />
+    <ClInclude Include="CGeometryGenerator.h" />
     <ClInclude Include="CMathUtil.h" />
     <ClInclude Include="CPhysicsComponent.h" />
+    <ClInclude Include="CRenderComponent.h" />
     <ClInclude Include="CSteeringBehaviors.h" />
     <ClInclude Include="CTestFramework.h" />
     <ClInclude Include="CTestPerson.h" />
@@ -170,6 +172,7 @@
     <ClInclude Include="CWin32GDI.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="CWIn32RenderComponent.h" />
     <ClInclude Include="CWindowsUtil.h" />
     <ClInclude Include="PrevTestLab_Win32.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -198,8 +201,10 @@
     <ClCompile Include="CGameTelegram.cpp" />
     <ClCompile Include="CGameTimer.cpp" />
     <ClCompile Include="CGameWorld.cpp" />
+    <ClCompile Include="CGeometryGenerator.cpp" />
     <ClCompile Include="CMathUtil.cpp" />
     <ClCompile Include="CPhysicsComponent.cpp" />
+    <ClCompile Include="CRenderComponent.cpp" />
     <ClCompile Include="CSteeringBehaviors.cpp" />
     <ClCompile Include="CTestFramework.cpp" />
     <ClCompile Include="CTestPerson.cpp" />
@@ -212,6 +217,7 @@
     <ClCompile Include="CWin32GDI.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="CWIn32RenderComponent.cpp" />
     <ClCompile Include="CWindowsUtil.cpp" />
     <ClCompile Include="main_DOS.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>

@@ -252,6 +252,11 @@ public:
 		}
 
 		LineTo(hdc_, (int)points[0].x_, (int)points[0].y_);
+
+		for (unsigned int p = 0; p < points.size(); ++p) {
+			std::cout << points[p].x_ << " " << points[p].y_ << std::endl;
+		}
+		
 	}
 
 

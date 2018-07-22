@@ -6,6 +6,7 @@
 #include"CGameWorld.h"
 
 class CGameComponent;
+class CRenderComponent;
 
 // CGameObject는 상속을 받지 아니하여도 되지만
 // 상태 컴포넌트를 소유하게 될 경우, 상속하여 상태를 나타내는
@@ -27,8 +28,16 @@ public:
 
 	int GetID() const { return ID_; }
 	void RegisterComponent(CGameComponent* p_component);
+	void RegisterRenderComponent(CRenderComponent* p_component);
+
 	void SendMessageToComponents(const Telegram& r_msg);	// 외부/내부 메시지
+	
+	void EnterToGameWorld(CGameWorld* p_game_world) { playground_ = p_game_world; }
+	void ExitFromGameWorld(void) { playground_ = nullptr; }
+	CGameWorld* GameWorld(void) { return playground_; }
+
 	void Update(float elapsed_time);
+	void Render(void);
 
 private:
 	CGameWorld* playground_;
@@ -36,6 +45,8 @@ private:
 	int ID_;						// 모든 엔티티들은 고유한 식별 번호를 갖는다.
 	static int next_valid_ID_;		// 이것은 유효한 다음 식별 번호이다.
 	
+	CRenderComponent* renderer_;
+
 	static const int MAX_COMPONENTS = 10;
 	CGameComponent* components_[MAX_COMPONENTS];
 	int registered_components_num_;

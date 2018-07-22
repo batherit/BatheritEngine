@@ -4,8 +4,20 @@
 #include "CVehicle.h"
 using namespace std;
 
+CSteeringBehavior::CSteeringBehavior(CVehicle* agent) {
+	float theta = RandFloat() * TwoPi;
+	wander_target_ = CVector2D(wander_radius_ * cos(theta), wander_radius_ * sin(theta));
+
+	// TODO : Path = new Path();
+	// TODO : Path->LoopOn();
+}
+
 CVector2D CSteeringBehavior::Calculate() {
-	return v_steering_force_;
+	v_steering_force_.Zero();
+
+	// TODO : 조종 행동을 변경
+
+	return v_steering_force_ = CVector2D(100.0f, 100.0f);
 }
 
 //this behavior moves the agent towards a target position

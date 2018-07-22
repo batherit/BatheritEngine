@@ -1,12 +1,14 @@
 #pragma once
 
 #include"CMathUtil.h"
+//#include"CVehicle.h"
+
 class CVehicle;
 
 class CSteeringBehavior
 {
 public:
-	CSteeringBehavior();
+	CSteeringBehavior(CVehicle* agent);
 	~CSteeringBehavior();
 	CVector2D Calculate();
 
