@@ -1,5 +1,2 @@
-﻿  stdafx.cpp
-  CTestFramework.cpp
-  PrevTestLab_Win32.cpp
-  코드를 생성하고 있습니다...
+﻿  CVehicleParamLoader.cpp
   PrevTestLab_Win32.vcxproj -> D:\My Lab\GameLab\GameEngine\BatheritEngine\Code\PrevTestLab_Win32\x64\Debug\PrevTestLab_Win32.exe

@@ -147,8 +147,17 @@ inline float CVector2D::Distance(const CVector2D &v2) const {
 }
 
 inline float CVector2D::DistanceSq(const CVector2D& v2) const {
-	float ySeparation = v2.y_ - y_;
-	float xSeparation = v2.x_ - x_;
+	float y_separation = v2.y_ - y_;
+	float x_separation = v2.x_ - x_;
+
+	return y_separation * y_separation + x_separation * x_separation;
+}
+
+inline double Vec2DDistanceSq(const CVector2D &v1, const CVector2D &v2)
+{
+
+	float ySeparation = v2.y_ - v1.y_;
+	float xSeparation = v2.x_ - v1.x_;
 
 	return ySeparation * ySeparation + xSeparation * xSeparation;
 }

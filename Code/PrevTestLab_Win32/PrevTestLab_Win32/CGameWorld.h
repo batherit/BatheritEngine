@@ -25,9 +25,16 @@ public:
 	void Render();
 
 	const std::vector<CWall2D>&			Walls() { return walls_; }
-	// TODO : CellSpacePartition<Vehicle*>*       CellSpace(){return m_pCellSpace;}
 	const std::vector<CGameObject*>&	Obstacles()const { return obstacles_; }
 	const std::vector<CGameObject*>&	Agents() { return agents_; }
+
+	// WM_COMMAND 메시지들을 핸들한다.
+	CVector2D PickPoint() const { return pick_point_; }
+	void SetPickPoint(POINTS p);
+	void SetPickPoint(CVector2D v) { pick_point_ = v; }
+
+	int ClientWidth()const { return client_width_; }
+	int ClientHeight()const { return client_height_; }
 
 private:
 	void CreateObstacles() {}
@@ -40,5 +47,5 @@ private:
 	Path*						p_path_;
 	bool						b_paused_;
 	int							client_width_, client_height_;
-	CVector2D					crosshair_;
+	CVector2D					pick_point_;
 };

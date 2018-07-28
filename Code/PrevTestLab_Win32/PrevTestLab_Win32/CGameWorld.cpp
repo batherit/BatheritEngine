@@ -39,3 +39,11 @@ void CGameWorld::ReleaseAgents(void) {
 	}
 	agents_.clear();
 }
+
+void CGameWorld::SetPickPoint(POINTS p) {
+	CVector2D pick_point((float)p.x, (float) p.y);
+
+	// TODO : 해당 픽 지점이 장애물 안에 없다는 것을 보장하는 코드 삽입
+
+	pick_point_ = pick_point;
+}

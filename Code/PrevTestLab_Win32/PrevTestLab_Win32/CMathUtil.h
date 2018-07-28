@@ -9,10 +9,10 @@ const double  MinDouble = (std::numeric_limits<double>::min)();
 const float   MaxFloat = (std::numeric_limits<float>::max)();
 const float   MinFloat = (std::numeric_limits<float>::min)();
 
-const double   Pi = 3.14159;
-const double   TwoPi = Pi * 2;
-const double   HalfPi = Pi / 2;
-const double   QuarterPi = Pi / 4;
+const float   Pi = 3.14159f;
+const float   TwoPi = Pi * 2;
+const float   HalfPi = Pi / 2;
+const float   QuarterPi = Pi / 4;
 
 class CMathUtil
 {

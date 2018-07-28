@@ -36,9 +36,9 @@ inline void CTestFramework::Init(int cx, int cy) {
 		new CVehicle(
 			20.0f,						// bounding_radius
 			CVector2D(20.0f, 20.0f),	// velocity
-			40.0f,						// max_speed
+			200.0f,						// max_speed
 			CVector2D(1.0f, 1.0f),		// look
-			20.0f,						// mass
+			30.0f,						// mass
 			10.0f,						// max_turn_rate
 			10.0f						// max_force
 		));

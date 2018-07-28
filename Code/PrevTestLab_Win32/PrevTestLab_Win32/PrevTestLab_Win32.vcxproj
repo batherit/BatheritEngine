@@ -157,6 +157,7 @@
     <ClInclude Include="CGameTimer.h" />
     <ClInclude Include="CGameWorld.h" />
     <ClInclude Include="CGeometryGenerator.h" />
+    <ClInclude Include="CIniFileLoaderBase.h" />
     <ClInclude Include="CMathUtil.h" />
     <ClInclude Include="CPhysicsComponent.h" />
     <ClInclude Include="CRenderComponent.h" />
@@ -168,6 +169,7 @@
     <ClInclude Include="CUtil.h" />
     <ClInclude Include="CVector2D.h" />
     <ClInclude Include="CVehicle.h" />
+    <ClInclude Include="CVehicleParamLoader.h" />
     <ClInclude Include="CWall2D.h" />
     <ClInclude Include="CWin32GDI.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
@@ -202,6 +204,7 @@
     <ClCompile Include="CGameTimer.cpp" />
     <ClCompile Include="CGameWorld.cpp" />
     <ClCompile Include="CGeometryGenerator.cpp" />
+    <ClCompile Include="CIniFileLoaderBase.cpp" />
     <ClCompile Include="CMathUtil.cpp" />
     <ClCompile Include="CPhysicsComponent.cpp" />
     <ClCompile Include="CRenderComponent.cpp" />
@@ -213,6 +216,7 @@
     <ClCompile Include="CUtil.cpp" />
     <ClCompile Include="CVector2D.cpp" />
     <ClCompile Include="CVehicle.cpp" />
+    <ClCompile Include="CVehicleParamLoader.cpp" />
     <ClCompile Include="CWall2D.cpp" />
     <ClCompile Include="CWin32GDI.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
