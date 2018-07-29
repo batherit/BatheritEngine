@@ -6,7 +6,7 @@
 
 class CPhysicsComponent : public CGameComponent {
 public:
-	CPhysicsComponent(float bounding_radius,
+	CPhysicsComponent(
 		CVector2D velocity,
 		float max_speed,
 		CVector2D look,
@@ -40,7 +40,6 @@ public:
 	float Speed()const { return v_velocity_.Length(); }
 	float SpeedSq()const { return v_velocity_.LengthSq(); }
 
-	/*CVector2D Look()const { return v_look_; }*/
 	void SetLook(CVector2D new_look);
 	bool RotateLookToFacePosition(CVector2D target);
 
@@ -48,11 +47,7 @@ public:
 	void SetMaxTurnRate(float max_turn_rate) { max_turn_rate_ = max_turn_rate; }
 
 protected:
-	float bounding_radius_;
-
 	CVector2D v_velocity_;
-	/*CVector2D v_look_;
-	CVector2D v_right_;*/
 
 	float mass_;
 	float max_speed_;

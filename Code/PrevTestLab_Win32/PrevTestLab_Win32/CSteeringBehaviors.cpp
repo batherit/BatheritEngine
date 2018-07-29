@@ -1,23 +1,24 @@
 #include<algorithm>
-#include"CUtil.h"
 #include "CSteeringBehaviors.h"
+#include"CUtil.h"
+#include "CGameTimer.h"
 #include "CVehicle.h"
 using namespace std;
 
 CSteeringBehavior::CSteeringBehavior(CVehicle* agent) :
 	p_vehicle_(agent),
 	behavior_flags_(0),
-	weight_seek_(),
-	weight_flee_(),
-	weight_arrive_(),
-	weight_pursuit_(),
-	weight_offset_pursuit_(),
-	weight_evade_(),
-	weight_wander_(),
+	weight_seek_(VehiclePrm.seek_weight_),
+	weight_flee_(VehiclePrm.flee_weight_),
+	weight_arrive_(VehiclePrm.arrive_weight_),
+	weight_pursuit_(VehiclePrm.pursuit_weight_),
+	weight_offset_pursuit_(VehiclePrm.offset_pursuit_weight_),
+	weight_evade_(VehiclePrm.evade_weight_),
+	weight_wander_(VehiclePrm.wander_weight_),
 	deceleration_(normal),
-	wander_distance_(),
-	wander_jitter_(),
-	wander_radius_(),
+	wander_distance_(WANDER_DIST),
+	wander_jitter_(WANDER_JITTER_PER_SEC),
+	wander_radius_(WANDER_RAD),
 	p_target_agent1_(nullptr),
 	p_target_agent2_(nullptr)
 {
@@ -26,6 +27,7 @@ CSteeringBehavior::CSteeringBehavior(CVehicle* agent) :
 
 	// TODO : Path = new Path();
 	// TODO : Path->LoopOn();
+	
 }
 
 CVector2D CSteeringBehavior::Calculate() {
@@ -35,7 +37,7 @@ CVector2D CSteeringBehavior::Calculate() {
 	// TODO : 조종 행동 유형 변경
 	v_steering_force_ = CalculateWeightedSum();
 
-	return v_steering_force_ = v_steering_force_;
+	return v_steering_force_;
 }
 
 //this behavior moves the agent towards a target position
@@ -144,31 +146,50 @@ CVector2D CSteeringBehavior::Evade(const CVehicle* pursuer) {
 CVector2D CSteeringBehavior::Wander() {
 	/*this behavior is dependent on the update rate, so this line must
 	be included when using time independent framerate.*/
+	float jitter_this_time_slice = wander_jitter_ * WorldTimer->GetElapsedTimePerFrame();  /*wander_jitter_ * WorldTimer*/
 
-	float JitterThisTimeSlice = 0.0f;  /*wander_jitter_ * WorldTimer*/
+	// 우선 소량의 무작위 벡터를 목표물의 위치에 더한다. (RandomClamped는
+	// -1과 1 사이의 값을 반환한다.
+	wander_target_ += CVector2D(RandomClamped() * jitter_this_time_slice,
+		RandomClamped() * jitter_this_time_slice);
 
-	/*first, add a small random vector to the target's position*/
-	wander_target_ += CVector2D(RandomClamped() * JitterThisTimeSlice,
-		RandomClamped() * JitterThisTimeSlice);
-
-	//reproject this new vector back on to a unit circle
+	// 이 새로운 벡터를 다시 단위원으로 재투사한다.
 	wander_target_.Normalize();
 
-	//increase the length of the vector to the same as the radius
-	//of the wander circle
+	// 벡터의 길이를 배회 원의 반경과 동일하게 증가시킨다.
 	wander_target_ *= wander_radius_;
 
-	//move the target into a position WanderDist in front of the agent
-	CVector2D target = wander_target_ + CVector2D(wander_distance_, 0);
+	// 목표를 에이전트 앞의 wander_distance_ 위치로 이동시킨다.
+	CVector2D target_local = wander_target_ + CVector2D(wander_distance_, 0);
 
-	//project the target into world space
-	CVector2D Target = PointToWorldSpace(target,
+	// 목표를 세계 공간으로 투사한다. Local -> World
+	CVector2D target_world = PointToWorldSpace(target_local,
 		p_vehicle_->p_owner_->transform_.look_,
 		p_vehicle_->p_owner_->transform_.right_,
 		p_vehicle_->p_owner_->transform_.pos_);
 
-	//and steer towards it
-	return Target - p_vehicle_->p_owner_->transform_.pos_;
+	// 그리고 그쪽으로 조종해간다.
+	return target_world - p_vehicle_->p_owner_->transform_.pos_;
+}
+
+CVector2D CSteeringBehavior::ObstacleAvoidance(const std::vector<CGameObject*>& obstacles) {
+	// 감지 상자의 길이는 에이전트의 속도에 비례한다.
+	detection_box_length_ = VehiclePrm.min_detection_box_length_ +
+		(p_vehicle_->Speed() / p_vehicle_->MaxSpeed()) *
+		VehiclePrm.min_detection_box_length_;
+
+	// 감지 상자 범위 내의 장애물들을 처리하기 위해 표시해둔다.
+	p_vehicle_->p_owner_->GameWorld()->TagObstaclesWithinViewRange(p_vehicle_->p_owner_, detection_box_length_);
+
+	// 이 부분은 교차하고 있는 가장 근접한 장애물(CIB)들을 추적한다.
+	CGameObject* closest_intersecting_obstacle = nullptr;
+
+	// 이 부분은 CIB까지의 거리를 추적하는데 사용된다.
+	float dist_to_closest_IP = MaxFloat;
+
+	// TODO : LocalPosOfClosestObstacle...2018/07/29
+	
+	return CVector2D(0.0f, 0.0f);
 }
 
 //---------------------- CalculateWeightedSum ----------------------------
@@ -223,8 +244,7 @@ CVector2D CSteeringBehavior::CalculateWeightedSum() {
 		v_steering_force_ += Evade(p_target_agent1_) * weight_evade_;
 	}
 
-	if (On(wander))
-	{
+	if (On(wander)){
 		v_steering_force_ += Wander() * weight_wander_;
 	}
 

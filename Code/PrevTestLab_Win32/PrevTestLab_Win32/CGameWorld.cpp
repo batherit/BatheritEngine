@@ -3,7 +3,8 @@
 
 CGameWorld::CGameWorld(int cx, int cy) :
 	client_width_(cx),
-	client_height_(cy)
+	client_height_(cy),
+	pick_point_(CVector2D(ClientWidth() / 2.0f, ClientHeight() / 2.0f))
 {
 }
 

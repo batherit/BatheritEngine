@@ -8,13 +8,13 @@ class CVehicle : public CPhysicsComponent
 {
 	friend class CSteeringBehavior;
 public:
-	CVehicle(float bounding_radius,
+	CVehicle(
 		CVector2D velocity,
 		float max_speed,
 		CVector2D look,
 		float mass,
 		float max_turn_rate,
-		float max_force) : CPhysicsComponent(bounding_radius,
+		float max_force) : CPhysicsComponent(
 			velocity,
 			max_speed,
 			look,
@@ -23,6 +23,7 @@ public:
 			max_force
 			){
 		p_steering_ = new CSteeringBehavior(this);
+		p_steering_->WanderOn();
 	}
 	
 	void Update(float time_elapsed);

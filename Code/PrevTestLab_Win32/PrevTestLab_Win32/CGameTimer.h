@@ -33,17 +33,30 @@ private:
 #define WorldTimer	CGameWorldTimer::Instance()
 
 class CGameWorldTimer {
-private:
-	// 싱글턴 패턴
-	
-	static CGameWorldTimer& instance() {
-		static CGameWorldTimer *instance = new CGameWorldTimer();
-		return *instance;
-	}
-
-	static CGameTimer world_timer_;
 public:
-	float GetElapsedTimePerFrame() { return world_timer_.GetElapsedTimePerFrame();}
-	float GetCurTime() { return world_timer_.GetCurTime(); }
-	float GetTotalTimeFromRun() { return world_timer_.GetTotalTimeFromRun(); }
+	static CGameTimer* Instance() {
+		static CGameTimer *instance = new CGameTimer(TIMER_TYPE_WINDOWS);
+		return instance;
+	}
 };
+
+//class CGameWorldTimer {
+//public:
+//	// 기능을 세가지로 제한한다.
+//	float GetElapsedTimePerFrame() { return world_timer_->GetElapsedTimePerFrame(); }
+//	float GetCurTime() { return world_timer_->GetCurTime(); }
+//	float GetTotalTimeFromRun() { return world_timer_->GetTotalTimeFromRun(); }
+//
+//private:
+//	CGameWorldTimer() {
+//		world_timer_->Reset();
+//	}
+//
+//	// 싱글턴 패턴
+//	static CGameWorldTimer* instance() {
+//		static CGameWorldTimer *instance = new CGameWorldTimer();
+//		return instance;
+//	}
+//
+//	static CGameTimer * world_timer_;
+//};

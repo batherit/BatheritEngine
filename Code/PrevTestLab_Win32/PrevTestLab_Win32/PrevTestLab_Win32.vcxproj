@@ -148,6 +148,7 @@
     <ClInclude Include="CGameCmd.h" />
     <ClInclude Include="CGameComponent.h" />
     <ClInclude Include="CGameFramework.h" />
+    <ClInclude Include="CGameMesh.h" />
     <ClInclude Include="CGameMessageDispatcher.h" />
     <ClInclude Include="CGameObject.h" />
     <ClInclude Include="CGameObjectManager.h" />
@@ -159,6 +160,7 @@
     <ClInclude Include="CGeometryGenerator.h" />
     <ClInclude Include="CIniFileLoaderBase.h" />
     <ClInclude Include="CMathUtil.h" />
+    <ClInclude Include="CObjectFuncTemplates.h" />
     <ClInclude Include="CPhysicsComponent.h" />
     <ClInclude Include="CRenderComponent.h" />
     <ClInclude Include="CSteeringBehaviors.h" />
@@ -195,6 +197,7 @@
     <ClCompile Include="CGameCmd.cpp" />
     <ClCompile Include="CGameComponent.cpp" />
     <ClCompile Include="CGameFramework.cpp" />
+    <ClCompile Include="CGameMesh.cpp" />
     <ClCompile Include="CGameMessageDispatcher.cpp" />
     <ClCompile Include="CGameObject.cpp" />
     <ClCompile Include="CGameObjectManager.cpp" />
@@ -206,6 +209,7 @@
     <ClCompile Include="CGeometryGenerator.cpp" />
     <ClCompile Include="CIniFileLoaderBase.cpp" />
     <ClCompile Include="CMathUtil.cpp" />
+    <ClCompile Include="CObjectFuncTemplates.cpp" />
     <ClCompile Include="CPhysicsComponent.cpp" />
     <ClCompile Include="CRenderComponent.cpp" />
     <ClCompile Include="CSteeringBehaviors.cpp" />

@@ -6,11 +6,8 @@
 class CWIn32RenderComponent : public CRenderComponent
 {
 public:
-	CWIn32RenderComponent(std::vector<CVector2D> meshVB) : meshVB_(meshVB) {}
+	CWIn32RenderComponent(){}
 	~CWIn32RenderComponent();
 
 	void Render(void);
-
-private:
-	std::vector<CVector2D> meshVB_;
 };

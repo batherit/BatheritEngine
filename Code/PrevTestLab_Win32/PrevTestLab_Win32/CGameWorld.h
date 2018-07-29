@@ -2,6 +2,7 @@
 #include<vector>
 #include"CWall2D.h"
 #include"CVector2D.h"
+#include"CObjectFuncTemplates.h"
 
 class CGameObject;
 class Obstacle;
@@ -23,6 +24,14 @@ public:
 
 	void Update(float tick);
 	void Render();
+
+	void  TagVehiclesWithinViewRange(CGameObject* pVehicle, float range) {
+		TagNeighbors(pVehicle, agents_, range);
+	}
+
+	void  TagObstaclesWithinViewRange(CGameObject* pVehicle, float range) {
+		TagNeighbors(pVehicle, obstacles_, range);
+	}
 
 	const std::vector<CWall2D>&			Walls() { return walls_; }
 	const std::vector<CGameObject*>&	Obstacles()const { return obstacles_; }

@@ -8,27 +8,30 @@
 class CGameFramework
 {
 public:
-	CGameFramework() { main_timer_ = new CGameTimer(TIMER_TYPE_WINDOWS); }
-	virtual ~CGameFramework() { if (!main_timer_) delete main_timer_;  }
+	CGameFramework() { }
+	virtual ~CGameFramework() { }
 
 	virtual void Init(int cx = 1920, int cy = 1080) = 0;
 	void RunWithLoop(void) { 
 		while (true) {
-			main_timer_->RunTick();
-			Update(main_timer_->GetElapsedTimePerFrame());
-			Render(main_timer_->GetElapsedTimePerFrame());
+			WorldTimer->RunTick();
+			Update(WorldTimer->GetElapsedTimePerFrame());
+			Render(WorldTimer->GetElapsedTimePerFrame());
 		}
 	}
 	void Run(void) {
-		main_timer_->RunTick();
-		Update(main_timer_->GetElapsedTimePerFrame());
-		Render(main_timer_->GetElapsedTimePerFrame());
+		WorldTimer->RunTick();
+		Update(WorldTimer->GetElapsedTimePerFrame());
+		Render(WorldTimer->GetElapsedTimePerFrame());
 	}
 	
+	// 외부에서 월드 타이머를 세팅해주어야 합니다.
 	virtual void Update(float tick) = 0;
 	virtual void Render(float tick) = 0;
 	virtual void Destroy(void) { delete this; }
 
-protected:
-	CGameTimer* main_timer_;
+	// 윈도우 키 입력 처리 메서드
+	virtual void OnMouseDown(WPARAM btnState, int x, int y) {}
+	virtual void OnMouseUp(WPARAM btnState, int x, int y) {}
+	virtual void OnMouseMove(WPARAM btnState, int x, int y) {}
 };

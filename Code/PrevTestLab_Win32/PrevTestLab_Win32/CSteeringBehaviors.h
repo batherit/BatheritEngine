@@ -1,9 +1,22 @@
 #pragma once
 
 #include"CMathUtil.h"
-//#include"CVehicle.h"
+#include"CVehicleParamLoader.h"
 
 class CVehicle;
+class CGameObject;
+
+//--------------------------- 상수목록 ----------------------------------
+
+// 배회 행동을 위한 배회원의 반지름
+const float WANDER_RAD = 1.2f;
+// 에이전트 앞에 배회원이 투사되는 거리 
+const float WANDER_DIST = 2.0f;
+// 각 프레임에 대한 배회원의 최대 변위량
+const float WANDER_JITTER_PER_SEC = 80.0f;
+
+// 길 따라가기에 쓰인다.
+const float WAY_POINT_SEEK_DIST = 20.0f;
 
 class CSteeringBehavior
 {
@@ -66,9 +79,16 @@ private:
 	// 에이전트가 가려고 하는 'wander 원'의 현재 좌표.
 	CVector2D wander_target_;
 
-	//explained above
+	// 장애물 회피에 사용되는 감지 상자의 길이
+	float detection_box_length_;
+
+	// 매초마다 목표물에 더해질 수 있는 무작위 변위
 	float wander_jitter_;
+
+	// 배회원 반경
 	float wander_radius_;
+
+	// 배회원이 투사되는 거리
 	float wander_distance_;
 
 	// 곱셈자. 행동에 자연스러움을 위해 사용된다.
@@ -119,6 +139,10 @@ private:
 
 	//this behavior makes the agent wander about randomly
 	CVector2D Wander();
+
+	// 이것은 에이전트가 직면하는 몇몇 장애물들과 멀어지도록하는 조종력을
+	// 반환하도록 합니다.
+	CVector2D ObstacleAvoidance(const std::vector<CGameObject*>& obstacles);
 
 	// 활성화된 몇가지 행동들에서 조종힘을 계산하고 더한다.
 	CVector2D CalculateWeightedSum();

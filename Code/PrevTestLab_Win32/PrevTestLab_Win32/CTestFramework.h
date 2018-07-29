@@ -21,6 +21,8 @@ public:
 	void Update(float tick);
 	void Render(float tick);
 
+	void OnMouseDown(WPARAM btnState, int x, int y);
+
 private:
 	CGameWorld* p_game_world_;
 	CTestPerson* p_test_object_;
@@ -34,15 +36,19 @@ inline void CTestFramework::Init(int cx, int cy) {
 		new CGameStateMachine<CTestPerson>(IDLE_STATE, GLOBAL_STATE));
 	p_test_object_->RegisterComponent(
 		new CVehicle(
-			20.0f,						// bounding_radius
-			CVector2D(20.0f, 20.0f),	// velocity
-			200.0f,						// max_speed
-			CVector2D(1.0f, 1.0f),		// look
-			30.0f,						// mass
-			10.0f,						// max_turn_rate
-			10.0f						// max_force
+			CVector2D(0.0f, 0.0f),					// velocity
+			VehiclePrm.max_speed_,					// max_speed
+			CVector2D(1.0f, 1.0f),					// look
+			VehiclePrm.vehicle_mass_,				// mass
+			VehiclePrm.max_turn_rate_per_second_,	// max_turn_rate
+			VehiclePrm.max_steering_force_			// max_force
 		));
-	p_test_object_->RegisterRenderComponent(new CWIn32RenderComponent(VehicleVB()));
+
+	CGameMesh* p_mesh = new CGameMesh();
+	p_mesh->SetMeshVB(VehicleVB());
+	p_mesh->SetBoundingRad(1.5f);
+	p_test_object_->SetMesh(p_mesh);
+	p_test_object_->RegisterRenderComponent(new CWIn32RenderComponent());
 
 	p_game_world_ = new CGameWorld(cx, cy);
 	std::vector<CGameObject*> agents;
@@ -51,12 +57,11 @@ inline void CTestFramework::Init(int cx, int cy) {
 }
 
 inline void CTestFramework::Update(float tick) {
-	main_timer_->RunTick();
 	if (p_game_world_) {
-		p_game_world_->Update(main_timer_->GetElapsedTimePerFrame());
+		p_game_world_->Update(tick);
 	}
 	else {
-		p_test_object_->Update(main_timer_->GetElapsedTimePerFrame());
+		p_test_object_->Update(tick);
 	}
 }
 
@@ -67,4 +72,8 @@ inline void CTestFramework::Render(float tick) {
 	else {
 		p_test_object_->Render();
 	}
+}
+
+inline void CTestFramework::OnMouseDown(WPARAM btnState, int x, int y) {
+	if (p_game_world_) p_game_world_->SetPickPoint(CVector2D(x, y));
 }
