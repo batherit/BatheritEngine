@@ -2,6 +2,7 @@
 #include "CSteeringBehaviors.h"
 #include"CUtil.h"
 #include "CGameTimer.h"
+#include "CGameObject.h"
 #include "CVehicle.h"
 using namespace std;
 
@@ -42,10 +43,10 @@ CVector2D CSteeringBehavior::Calculate() {
 
 //this behavior moves the agent towards a target position
 CVector2D CSteeringBehavior::Seek(CVector2D target_pos) {
-	CVector2D desired_velocity = Vec2DNormalize(target_pos - p_vehicle_->p_owner_->transform_.pos_)
-		* p_vehicle_->max_speed_;
+	CVector2D desired_velocity = Vec2DNormalize(target_pos - p_vehicle_->transform_.pos_)
+		* p_vehicle_->physics_->MaxSpeed();
 
-	return (desired_velocity - p_vehicle_->v_velocity_);
+	return (desired_velocity - p_vehicle_->physics_->Velocity());
 }
 
 //this behavior returns a vector that moves the agent away
@@ -54,20 +55,20 @@ CVector2D CSteeringBehavior::Flee(CVector2D target_pos) {
 	
 	// 패닉 상태(제곱 거리 판별)에 있을 때에만 '달아나기(Flee)'가 유효하도록 한다.
 	const double panic_distance_sq = 100.0f * 100.0f;
-	if (Vec2DDistanceSq(p_vehicle_->p_owner_->transform_.pos_, target_pos) > panic_distance_sq) {
+	if (Vec2DDistanceSq(p_vehicle_->transform_.pos_, target_pos) > panic_distance_sq) {
 		return CVector2D(0,0);
 	}
 	
 
-	CVector2D desired_velocity = Vec2DNormalize(p_vehicle_->p_owner_->transform_.pos_ - target_pos)
-		* p_vehicle_->max_speed_;
+	CVector2D desired_velocity = Vec2DNormalize(p_vehicle_->transform_.pos_ - target_pos)
+		* p_vehicle_->physics_->MaxSpeed();
 
-	return (desired_velocity - p_vehicle_->v_velocity_);
+	return (desired_velocity - p_vehicle_->physics_->Velocity());
 }
 
 // 목표에 도달하기 위한 가감속이 있는 '찾기(Seek)'행동이라 보면 될 것이다.
 CVector2D CSteeringBehavior::Arrive(CVector2D     TargetPos, Deceleration deceleration) {
-	CVector2D to_target = TargetPos - p_vehicle_->p_owner_->transform_.pos_;
+	CVector2D to_target = TargetPos - p_vehicle_->transform_.pos_;
 
 	//calculate the distance to the target
 	float dist = to_target.Length();
@@ -82,14 +83,14 @@ CVector2D CSteeringBehavior::Arrive(CVector2D     TargetPos, Deceleration decele
 		float speed = dist / ((float)deceleration * deceleration_tweaker);
 
 		// 속도가 최대값이 넘지 않는지를 확인한다.
-		speed = min(speed, p_vehicle_->max_speed_);
+		speed = min(speed, p_vehicle_->physics_->MaxSpeed());
 
 		// 여기서부터는 이미 to_target 벡터의 길이, dist를 계산했으므로
 		// 이 벡터를 정규화할 필요가 없다는 것을 제외하고는
 		// 찾기와 같은 방법으로 진행한다.
 		CVector2D desired_velocity = to_target * speed / dist;
 
-		return (desired_velocity - p_vehicle_->v_velocity_);
+		return (desired_velocity - p_vehicle_->physics_->Velocity());
 	}
 
 	return CVector2D(0, 0);
@@ -100,14 +101,14 @@ CVector2D CSteeringBehavior::Arrive(CVector2D     TargetPos, Deceleration decele
 CVector2D CSteeringBehavior::Pursuit(const CVehicle* evader) {
 	// 만약 도피자가 앞에 있고 에이전트를 대면하고 있다면, 도피자의
 	// 현재 위치만을 찾을 수 있다.
-	CVector2D to_evader = evader->p_owner_->transform_.pos_ - p_vehicle_->p_owner_->transform_.pos_;
+	CVector2D to_evader = evader->transform_.pos_ - p_vehicle_->transform_.pos_;
 
-	float relative_look = p_vehicle_->p_owner_->transform_.look_.Dot(evader->p_owner_->transform_.look_);
+	float relative_look = p_vehicle_->transform_.look_.Dot(evader->transform_.look_);
 
-	if ((to_evader.Dot(p_vehicle_->p_owner_->transform_.look_) > 0) &&
+	if ((to_evader.Dot(p_vehicle_->transform_.look_) > 0) &&
 		(relative_look < -0.95))  //acos(0.95)=18 degs
 	{
-		return Seek(evader->p_owner_->transform_.pos_);
+		return Seek(evader->transform_.pos_);
 	}
 
 	// 바로 앞에 있지 않다고 간주되면, 도피자가 어디 있을 것인지를 예측한다.
@@ -115,17 +116,17 @@ CVector2D CSteeringBehavior::Pursuit(const CVehicle* evader) {
 	// 예측 시간은 도피자와 추격자 사이의 거리에 비례하고,
 	// 이 에이전트들의 속도의 합에는 반비례한다.
 	float look_ahead_time = to_evader.Length() /
-		(p_vehicle_->max_speed_ + evader->Speed());
+		(p_vehicle_->physics_->MaxSpeed() + evader->physics_->Speed());
 
 	// 이제 도피자가 있을 것으로 예측된 미래 위치로 찾아간다.
-	return Seek(evader->p_owner_->transform_.pos_ + evader->v_velocity_ * look_ahead_time);
+	return Seek(evader->transform_.pos_ + evader->physics_->Velocity() * look_ahead_time);
 }
 
 //this behavior attempts to evade a pursuer
 CVector2D CSteeringBehavior::Evade(const CVehicle* pursuer) {
 	/* Not necessary to include the check for facing direction this time */
 
-	CVector2D ToPursuer = pursuer->p_owner_->transform_.pos_ - p_vehicle_->p_owner_->transform_.pos_;
+	CVector2D ToPursuer = pursuer->transform_.pos_ - p_vehicle_->transform_.pos_;
 
 	//uncomment the following two lines to have Evade only consider pursuers 
 	//within a 'threat range'
@@ -136,10 +137,10 @@ CVector2D CSteeringBehavior::Evade(const CVehicle* pursuer) {
 	//and the pursuer; and is inversely proportional to the sum of the
 	//agents' velocities
 	float LookAheadTime = ToPursuer.Length() /
-		(p_vehicle_->max_speed_ + pursuer->Speed());
+		(p_vehicle_->physics_->MaxSpeed() + pursuer->physics_->Speed());
 
 	//now flee away from predicted future position of the pursuer
-	return Flee(pursuer->p_owner_->transform_.pos_ + pursuer->v_velocity_ * LookAheadTime);
+	return Flee(pursuer->transform_.pos_ + pursuer->physics_->Velocity() * LookAheadTime);
 }
 
 //this behavior makes the agent wander about randomly
@@ -164,22 +165,22 @@ CVector2D CSteeringBehavior::Wander() {
 
 	// 목표를 세계 공간으로 투사한다. Local -> World
 	CVector2D target_world = PointToWorldSpace(target_local,
-		p_vehicle_->p_owner_->transform_.look_,
-		p_vehicle_->p_owner_->transform_.right_,
-		p_vehicle_->p_owner_->transform_.pos_);
+		p_vehicle_->transform_.look_,
+		p_vehicle_->transform_.right_,
+		p_vehicle_->transform_.pos_);
 
 	// 그리고 그쪽으로 조종해간다.
-	return target_world - p_vehicle_->p_owner_->transform_.pos_;
+	return target_world - p_vehicle_->transform_.pos_;
 }
 
 CVector2D CSteeringBehavior::ObstacleAvoidance(const std::vector<CGameObject*>& obstacles) {
 	// 감지 상자의 길이는 에이전트의 속도에 비례한다.
 	detection_box_length_ = VehiclePrm.min_detection_box_length_ +
-		(p_vehicle_->Speed() / p_vehicle_->MaxSpeed()) *
+		(p_vehicle_->physics_->Speed() / p_vehicle_->physics_->MaxSpeed()) *
 		VehiclePrm.min_detection_box_length_;
 
 	// 감지 상자 범위 내의 장애물들을 처리하기 위해 표시해둔다.
-	p_vehicle_->p_owner_->GameWorld()->TagObstaclesWithinViewRange(p_vehicle_->p_owner_, detection_box_length_);
+	p_vehicle_->GameWorld()->TagObstaclesWithinViewRange(p_vehicle_, detection_box_length_);
 
 	// 이 부분은 교차하고 있는 가장 근접한 장애물(CIB)들을 추적한다.
 	CGameObject* closest_intersecting_obstacle = nullptr;
@@ -206,7 +207,7 @@ CVector2D CSteeringBehavior::CalculateWeightedSum() {
 		//TODO : obstacle_avoidance에 대한 행동 정의
 	}
 
-	CVector2D pick_point = p_vehicle_->p_owner_->GameWorld()->PickPoint();
+	CVector2D pick_point = p_vehicle_->GameWorld()->PickPoint();
 
 	if (On(seek))
 	{
@@ -248,7 +249,7 @@ CVector2D CSteeringBehavior::CalculateWeightedSum() {
 		v_steering_force_ += Wander() * weight_wander_;
 	}
 
-	v_steering_force_.Truncate(p_vehicle_->MaxForce());
+	v_steering_force_.Truncate(p_vehicle_->physics_->MaxForce());
 
 	return v_steering_force_;
 }

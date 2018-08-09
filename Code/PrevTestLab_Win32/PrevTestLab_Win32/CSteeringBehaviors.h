@@ -29,8 +29,8 @@ public:
 	CVector2D Calculate();
 
 	// ~On : 해당 행동을 활성화시킨다.
-	void SeekOn() { behavior_flags_ |= flee; }
-	void FleeOn() { behavior_flags_ |= seek; }
+	void SeekOn() { behavior_flags_ |= seek; }
+	void FleeOn() { behavior_flags_ |= flee; }
 	void ArriveOn() { behavior_flags_ |= arrive; }
 	void PursuitOn(CVehicle* v) { behavior_flags_ |= pursuit; p_target_agent1_ = v; }
 	void OffsetPursuitOn(CVehicle* v1, const CVector2D offset) { behavior_flags_ |= offset_pursuit;  p_target_agent1_ = v1; }

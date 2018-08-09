@@ -30,19 +30,20 @@ private:
 
 inline void CTestFramework::Init(int cx, int cy) {
 	
-	p_test_object_ = new CTestPerson(0);
+	p_test_object_ = new CTestPerson(0,
+		CVector2D(0.0f, 0.0f),					// velocity
+		VehiclePrm.max_speed_,					// max_speed
+		CVector2D(1.0f, 1.0f),					// look
+		VehiclePrm.vehicle_mass_,				// mass
+		VehiclePrm.max_turn_rate_per_second_,	// max_turn_rate
+		VehiclePrm.max_steering_force_			// max_force
+	);
+	p_test_object_->Steering()->SeekOn();
 	p_test_object_->transform_.scale_ = CVector2D(50.0f, 50.0f);
+	
+	// »óÅÂ ±â°è ÄÄÆ÷³ÍÆ® ÀåÂø
 	p_test_object_->RegisterComponent(
 		new CGameStateMachine<CTestPerson>(IDLE_STATE, GLOBAL_STATE));
-	p_test_object_->RegisterComponent(
-		new CVehicle(
-			CVector2D(0.0f, 0.0f),					// velocity
-			VehiclePrm.max_speed_,					// max_speed
-			CVector2D(1.0f, 1.0f),					// look
-			VehiclePrm.vehicle_mass_,				// mass
-			VehiclePrm.max_turn_rate_per_second_,	// max_turn_rate
-			VehiclePrm.max_steering_force_			// max_force
-		));
 
 	CGameMesh* p_mesh = new CGameMesh();
 	p_mesh->SetMeshVB(VehicleVB());

@@ -5,6 +5,7 @@
 #include"CTransformComponent.h"
 #include"CGameMesh.h"
 #include"CGameWorld.h"
+#include "CPhysicsComponent.h"
 
 class CGameComponent;
 class CRenderComponent;
@@ -20,6 +21,8 @@ public:
 	CGameObject(int ID) : 
 		registered_components_num_(0),
 		mesh_(nullptr),
+		physics_(nullptr),
+		renderer_(nullptr),
 		playground_(nullptr),
 		is_tagged_(false) { 
 		SetID(ID);
@@ -46,10 +49,10 @@ public:
 	void ExitFromGameWorld(void) { playground_ = nullptr; }
 	CGameWorld* GameWorld(void) { return playground_; }
 
-	void Update(float elapsed_time);
+	virtual void Update(float elapsed_time);
 	void Render(void);
 
-private:
+protected:
 	CGameMesh * mesh_;
 	CGameWorld* playground_;
 
@@ -58,6 +61,7 @@ private:
 	
 	bool is_tagged_;
 	
+	CPhysicsComponent* physics_;
 	CRenderComponent* renderer_;
 
 	static const int MAX_COMPONENTS = 10;

@@ -1,11 +1,17 @@
 #pragma once
 #include<cassert>
 #include"CMathUtil.h"
-#include"CGameObject.h"
 #include"CGameComponent.h"
 
 class CPhysicsComponent : public CGameComponent {
 public:
+	CPhysicsComponent() :
+		v_velocity_(CVector2D(0.0f, 0.0f)),
+		mass_(0.0f),
+		max_speed_(0.0f),
+		max_turn_rate_(0.0f),
+		max_force_(0.0f) {}
+
 	CPhysicsComponent(
 		CVector2D velocity,
 		float max_speed,
@@ -46,6 +52,9 @@ public:
 	float MaxTurnRate()const { return max_turn_rate_; }
 	void SetMaxTurnRate(float max_turn_rate) { max_turn_rate_ = max_turn_rate; }
 
+	void Receive(const Telegram& r_msg) {};	// CGameObject가 호출
+	void Update(float elapsed_time) {};		// SendMessage 호출 가능, CGameObject가 호출
+
 protected:
 	CVector2D v_velocity_;
 
@@ -54,41 +63,3 @@ protected:
 	float max_force_;
 	float max_turn_rate_;
 };
-
-inline void CPhysicsComponent::SetLook(CVector2D new_look)
-{
-	assert((new_look.LengthSq() - 1.0) < 1E-5);
-
-	p_owner_->transform_.look_ = new_look;
-
-	p_owner_->transform_.right_ = new_look.Perp();
-}
-
-inline bool CPhysicsComponent::RotateLookToFacePosition(CVector2D target)
-{
-	CVector2D toTarget = Vec2DNormalize(target - p_owner_->transform_.pos_);
-
-	//first determine the angle between the heading vector and the target
-	float angle = acos(p_owner_->transform_.look_.Dot(toTarget));
-
-	//return true if the player is facing the target
-	if (angle < 1E-5) return true;
-
-	//clamp the amount to turn to the max turn rate
-	if (angle > max_turn_rate_) angle = max_turn_rate_;
-
-	//The next few lines use a rotation matrix to rotate the player's heading
-	//vector accordingly
-	C2DMatrix RotationMatrix;
-
-	//notice how the direction of rotation has to be determined when creating
-	//the rotation matrix
-	RotationMatrix.Rotate(angle * p_owner_->transform_.look_.Sign(toTarget));
-	RotationMatrix.TransformVector2Ds(p_owner_->transform_.look_);
-	RotationMatrix.TransformVector2Ds(v_velocity_);
-
-	//finally recreate m_vSide
-	p_owner_->transform_.right_ = p_owner_->transform_.look_.Perp();
-
-	return false;
-}
