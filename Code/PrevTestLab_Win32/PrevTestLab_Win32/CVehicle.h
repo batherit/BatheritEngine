@@ -36,9 +36,10 @@ public:
 	CSteeringBehavior*const  Steering()const { return p_steering_; }
 
 private:
-	
 	CVehicle(const CVehicle&);
 	CVehicle& operator=(const CVehicle&);
 	CSteeringBehavior * p_steering_;
+
+	bool is_tagged_;
 };
 

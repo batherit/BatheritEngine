@@ -129,6 +129,12 @@
     <ClInclude Include="CGameMesh.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="CAudioComponent.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="CFMOD.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -240,6 +246,12 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="CGameMesh.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="CAudioComponent.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="CFMOD.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

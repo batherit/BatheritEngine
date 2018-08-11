@@ -25,7 +25,7 @@ public:
 	void Update(float tick);
 	void Render();
 
-	void  TagVehiclesWithinViewRange(CGameObject* pVehicle, float range) {
+	void  TagAgentsWithinViewRange(CGameObject* pVehicle, float range) {
 		TagNeighbors(pVehicle, agents_, range);
 	}
 

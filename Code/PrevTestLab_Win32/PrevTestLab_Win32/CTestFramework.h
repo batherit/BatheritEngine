@@ -58,6 +58,7 @@ inline void CTestFramework::Init(int cx, int cy) {
 }
 
 inline void CTestFramework::Update(float tick) {
+	FMOD->Instance();
 	if (p_game_world_) {
 		p_game_world_->Update(tick);
 	}

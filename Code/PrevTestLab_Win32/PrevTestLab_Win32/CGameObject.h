@@ -23,8 +23,8 @@ public:
 		mesh_(nullptr),
 		physics_(nullptr),
 		renderer_(nullptr),
-		playground_(nullptr),
-		is_tagged_(false) { 
+		playground_(nullptr), 
+		is_tagged_(false) {
 		SetID(ID);
 		memset(components_, '\0', sizeof(components_));
 		// 게임 객체는 생성되면 자동으로 게임 객체 관리자에 등록된다.
@@ -33,10 +33,6 @@ public:
 	virtual ~CGameObject();
 
 	int GetID() const { return ID_; }
-
-	bool IsTagged() const { return is_tagged_; }
-	void TagOn() { is_tagged_ = true; }
-	void TagOff() { is_tagged_ = false; }
 
 	void SetMesh(CGameMesh* p_mesh) { mesh_ = p_mesh; }
 	CGameMesh* Mesh(void) { return mesh_; }
@@ -49,17 +45,21 @@ public:
 	void ExitFromGameWorld(void) { playground_ = nullptr; }
 	CGameWorld* GameWorld(void) { return playground_; }
 
+	bool IsTagged() const { return is_tagged_; }
+	void TagOn() { is_tagged_ = true; }
+	void TagOff() { is_tagged_ = false; }
+
 	virtual void Update(float elapsed_time);
 	void Render(void);
 
 protected:
+	void SetID(int ID);
+
 	CGameMesh * mesh_;
 	CGameWorld* playground_;
 
 	int ID_;						// 모든 엔티티들은 고유한 식별 번호를 갖는다.
 	static int next_valid_ID_;		// 이것은 유효한 다음 식별 번호이다.
-	
-	bool is_tagged_;
 	
 	CPhysicsComponent* physics_;
 	CRenderComponent* renderer_;
@@ -68,5 +68,5 @@ protected:
 	CGameComponent* components_[MAX_COMPONENTS];
 	int registered_components_num_;
 
-	void SetID(int ID);
+	bool is_tagged_;
 };

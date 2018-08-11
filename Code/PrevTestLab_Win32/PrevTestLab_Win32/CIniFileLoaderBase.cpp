@@ -44,7 +44,7 @@ void CIniFileLoaderBase::GetParameterValueAsString(std::string& line) {
 	string::size_type end_idx;
 
 	// 몇 가지 구분 기호를 정의합니다.
-	const string delims(" \;=,");
+	const string delims(" ;=,");
 
 	// line에서 delims에 포함되지 않은 문자의 배열 인덱스를 가져옵니다.
 	// Ex. Value 12 => result 0
@@ -95,7 +95,7 @@ std::string CIniFileLoaderBase::GetNextToken() {
 	string::size_type end_idx;
 
 	// 몇가지 구분기호를 정의합니다.
-	const string delims(" \;=,");
+	const string delims(" ;=,");
 
 	begin_idx = current_line_.find_first_not_of(delims);
 

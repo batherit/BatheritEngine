@@ -4,6 +4,7 @@
 #include"CGameTimer.h"
 #include"CGameWorld.h"
 #include"CGameObject.h"
+#include"CFMOD.h"
 
 class CGameFramework
 {

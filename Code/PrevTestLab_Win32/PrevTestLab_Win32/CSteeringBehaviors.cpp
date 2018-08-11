@@ -187,9 +187,67 @@ CVector2D CSteeringBehavior::ObstacleAvoidance(const std::vector<CGameObject*>& 
 
 	// 이 부분은 CIB까지의 거리를 추적하는데 사용된다.
 	float dist_to_closest_IP = MaxFloat;
-
-	// TODO : LocalPosOfClosestObstacle...2018/07/29
+	CVector2D local_pos_of_closest_obstacle;
 	
+	std::vector<CGameObject*>::const_iterator curOb = obstacles.begin();
+
+	//while (curOb != obstacles.end())
+	//{
+	//	//if the obstacle has been tagged within range proceed
+	//	if ((*curOb)->IsTagged())
+	//	{
+	//		//calculate this obstacle's position in local space
+	//		CVector2D LocalPos = PointToLocalSpace((*curOb)->Pos(),
+	//			m_pVehicle->Heading(),
+	//			m_pVehicle->Side(),
+	//			m_pVehicle->Pos());
+
+	//		//if the local position has a negative x value then it must lay
+	//		//behind the agent. (in which case it can be ignored)
+	//		if (LocalPos.x >= 0)
+	//		{
+	//			//if the distance from the x axis to the object's position is less
+	//			//than its radius + half the width of the detection box then there
+	//			//is a potential intersection.
+	//			double ExpandedRadius = (*curOb)->BRadius() + m_pVehicle->BRadius();
+
+	//			if (fabs(LocalPos.y) < ExpandedRadius)
+	//			{
+	//				//now to do a line/circle intersection test. The center of the 
+	//				//circle is represented by (cX, cY). The intersection points are 
+	//				//given by the formula x = cX +/-sqrt(r^2-cY^2) for y=0. 
+	//				//We only need to look at the smallest positive value of x because
+	//				//that will be the closest point of intersection.
+	//				double cX = LocalPos.x;
+	//				double cY = LocalPos.y;
+
+	//				//we only need to calculate the sqrt part of the above equation once
+	//				double SqrtPart = sqrt(ExpandedRadius*ExpandedRadius - cY * cY);
+
+	//				double ip = cX - SqrtPart;
+
+	//				if (ip <= 0.0)
+	//				{
+	//					ip = cX + SqrtPart;
+	//				}
+
+	//				//test to see if this is the closest so far. If it is keep a
+	//				//record of the obstacle and its local coordinates
+	//				if (ip < DistToClosestIP)
+	//				{
+	//					DistToClosestIP = ip;
+
+	//					ClosestIntersectingObstacle = *curOb;
+
+	//					LocalPosOfClosestObstacle = LocalPos;
+	//				}
+	//			}
+	//		}
+	//	}
+
+	//	++curOb;
+	//}
+
 	return CVector2D(0.0f, 0.0f);
 }
 

@@ -19,6 +19,7 @@ public:
 	float       GetNextParameterFloat() { if (is_good_file_) return (float)atof(GetNextParameter().c_str()); throw std::runtime_error("bad file"); }
 	int         GetNextParameterInt() { if (is_good_file_) return atoi(GetNextParameter().c_str()); throw std::runtime_error("bad file"); }
 	bool        GetNextParameterBool() { return (bool)(atoi(GetNextParameter().c_str())); throw std::runtime_error("bad file"); }
+	std::string GetNextParameterString() { if (is_good_file_) return GetNextParameter().c_str(); throw std::runtime_error("bad file"); }
 
 	double      GetNextTokenAsDouble() { if (is_good_file_) return atof(GetNextToken().c_str()); throw std::runtime_error("bad file"); }
 	float       GetNextTokenAsFloat() { if (is_good_file_) return (float)atof(GetNextToken().c_str()); throw std::runtime_error("bad file"); }

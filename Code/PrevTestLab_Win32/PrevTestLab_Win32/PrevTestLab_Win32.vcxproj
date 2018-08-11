@@ -75,6 +75,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>D:\MyLab\GameLab\GameEngine\FMOD Studio API Windows\api\lowlevel\inc;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\MyLab\GameLab\GameEngine\FMOD Studio API Windows\api\lowlevel\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -106,6 +108,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>fmod_vc.lib;fmod64_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -144,7 +147,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="C2DMatrix.h" />
+    <ClInclude Include="CAudioComponent.h" />
     <ClInclude Include="CCommonUtil.h" />
+    <ClInclude Include="CFMOD.h" />
     <ClInclude Include="CGameCmd.h" />
     <ClInclude Include="CGameComponent.h" />
     <ClInclude Include="CGameFramework.h" />
@@ -193,7 +198,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="C2DMatrix.cpp" />
+    <ClCompile Include="CAudioComponent.cpp" />
     <ClCompile Include="CCommonUtil.cpp" />
+    <ClCompile Include="CFMOD.cpp" />
     <ClCompile Include="CGameCmd.cpp" />
     <ClCompile Include="CGameComponent.cpp" />
     <ClCompile Include="CGameFramework.cpp" />
