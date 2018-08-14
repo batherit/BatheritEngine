@@ -191,64 +191,87 @@ CVector2D CSteeringBehavior::ObstacleAvoidance(const std::vector<CGameObject*>& 
 	
 	std::vector<CGameObject*>::const_iterator curOb = obstacles.begin();
 
-	//while (curOb != obstacles.end())
-	//{
-	//	//if the obstacle has been tagged within range proceed
-	//	if ((*curOb)->IsTagged())
-	//	{
-	//		//calculate this obstacle's position in local space
-	//		CVector2D LocalPos = PointToLocalSpace((*curOb)->Pos(),
-	//			m_pVehicle->Heading(),
-	//			m_pVehicle->Side(),
-	//			m_pVehicle->Pos());
+	while (curOb != obstacles.end())
+	{
+		// 장애물이 범위 내 태그된 경우 진행한다.
+		if ((*curOb)->IsTagged())
+		{
+			// 비히클의 로컬 공간에서 장애물의 위치를 계산한다.
+			CVector2D local_pos = PointToLocalSpace((*curOb)->transform_.pos_,
+				p_vehicle_->transform_.look_,
+				p_vehicle_->transform_.right_,
+				p_vehicle_->transform_.pos_);
 
-	//		//if the local position has a negative x value then it must lay
-	//		//behind the agent. (in which case it can be ignored)
-	//		if (LocalPos.x >= 0)
-	//		{
-	//			//if the distance from the x axis to the object's position is less
-	//			//than its radius + half the width of the detection box then there
-	//			//is a potential intersection.
-	//			double ExpandedRadius = (*curOb)->BRadius() + m_pVehicle->BRadius();
 
-	//			if (fabs(LocalPos.y) < ExpandedRadius)
-	//			{
-	//				//now to do a line/circle intersection test. The center of the 
-	//				//circle is represented by (cX, cY). The intersection points are 
-	//				//given by the formula x = cX +/-sqrt(r^2-cY^2) for y=0. 
-	//				//We only need to look at the smallest positive value of x because
-	//				//that will be the closest point of intersection.
-	//				double cX = LocalPos.x;
-	//				double cY = LocalPos.y;
+			// 로컬 위치가 음수 x 값이면 에이전트 뒤에 있어야 한다. (이 경우 무시할 수 있음)
+			if (local_pos.x_ >= 0)
+			{
 
-	//				//we only need to calculate the sqrt part of the above equation once
-	//				double SqrtPart = sqrt(ExpandedRadius*ExpandedRadius - cY * cY);
+				// x 축에서 객체의 위치까지의 거리가 반경 + 감지 상자의 너비의 절반보다 작으면 
+				// 잠재적인 교차점이라 할 수 있다.
+				float expanded_radius =
+					(*curOb)->Mesh()->GetBoundingRad() +
+					p_vehicle_->Mesh()->GetBoundingRad();
 
-	//				double ip = cX - SqrtPart;
+				if (fabs(local_pos.y_) < expanded_radius)
+				{
+					// 이제 선 / 원 교차 테스트를 수행한다. 원의 중심은(cX, cY)로 표시된다.
+					// 교점은 y = 0에 대한 공식 x = cX + / -sqrt(r ^ 2 - cY ^ 2)로 표시된다.
+					// x의 가장 작은 양의 값은 가장 가까운 교차점이 될 것이다.
+					float cX = local_pos.x_;
+					float cY = local_pos.y_;
 
-	//				if (ip <= 0.0)
-	//				{
-	//					ip = cX + SqrtPart;
-	//				}
+					// 위 방정식의 sqrt 부분을 한 번만 계산하면 된다.
+					float sqrt_part = sqrt(expanded_radius*expanded_radius - cY * cY);
 
-	//				//test to see if this is the closest so far. If it is keep a
-	//				//record of the obstacle and its local coordinates
-	//				if (ip < DistToClosestIP)
-	//				{
-	//					DistToClosestIP = ip;
+					float ip = cX - sqrt_part;
 
-	//					ClosestIntersectingObstacle = *curOb;
+					if (ip <= 0.0)
+					{
+						ip = cX + sqrt_part;
+					}
 
-	//					LocalPosOfClosestObstacle = LocalPos;
-	//				}
-	//			}
-	//		}
-	//	}
+					// 장애물과 그 지역 좌표를 기록한다면, 이것이 가장 가까운 것인지를 판단한다. 
+					if (ip < dist_to_closest_IP)
+					{
+						dist_to_closest_IP = ip;
 
-	//	++curOb;
-	//}
+						closest_intersecting_obstacle = *curOb;
 
-	return CVector2D(0.0f, 0.0f);
+						local_pos_of_closest_obstacle = local_pos;
+					}
+				}
+			}
+		}
+
+		++curOb;
+	}
+
+	// 교차하는 장애물을 발견했다면, 그것으로부터 조향 힘을 계산한다.
+	CVector2D steering_force;
+
+	if (closest_intersecting_obstacle)
+	{
+		// 에이전트가 객체에 가까울수록 조향력이 강해야 한다.
+		float multiplier = 1.0f + (detection_box_length_ - local_pos_of_closest_obstacle.x_) /
+			detection_box_length_;
+
+		// 횡력(lateral force)을 계산한다.
+		steering_force.y_ = (closest_intersecting_obstacle->Mesh()->GetBoundingRad() -
+			local_pos_of_closest_obstacle.y_)  * multiplier;
+
+		// 차량으로부터의 장애물 거리에 비례하는 제동력을가한다.
+		const float braking_weight = 0.2f;
+
+		steering_force.x_ = (closest_intersecting_obstacle->Mesh()->GetBoundingRad() -
+			local_pos_of_closest_obstacle.x_) *
+			braking_weight;
+	}
+
+	// 마지막으로, 조향력을 로컬 공간에서 월드 공간으로 변환한다.
+	return VectorToWorldSpace(steering_force,
+		p_vehicle_->transform_.look_,
+		p_vehicle_->transform_.right_);
 }
 
 //---------------------- CalculateWeightedSum ----------------------------

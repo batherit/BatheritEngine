@@ -24,3 +24,20 @@ inline std::vector<CVector2D> VehicleVB(void) {
 
 	return vehicleVB;
 }
+
+inline std::vector<CVector2D> ObstacleVB(float radius) {
+	std::vector<CVector2D> obstacleVB;
+	const int NumVehicleVerts = 15;
+
+	for (int vtx = 0; vtx<NumVehicleVerts; ++vtx)
+	{
+		CVector2D vertex =
+			CVector2D(
+				radius * cos((float)(360 / NumVehicleVerts * vtx) * (Pi / 180.0f)),
+				radius * sin((float)(360 / NumVehicleVerts * vtx) * (Pi / 180.0f))
+			);
+		obstacleVB.push_back(vertex);
+	}
+
+	return obstacleVB;
+}

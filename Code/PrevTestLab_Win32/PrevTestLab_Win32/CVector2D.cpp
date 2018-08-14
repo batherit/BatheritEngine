@@ -19,3 +19,4 @@ std::ifstream& operator>>(std::ifstream& is, CVector2D& lhs)
 
 	return is;
 }
+

@@ -17,6 +17,10 @@ public:
 	~CGameWorld();
 
 	void RegisterAgents(std::vector<CGameObject*>& agents);
+	
+	// 게임월드가 상속이 되는 존재라면 제거하는 것을 고려해본다.
+	void RegisterObstacles(std::vector<CGameObject*>& obstacles);	
+	void RegisterWalls(std::vector<CWall2D>& walls);
 	void ReleaseAgents(void);
 
 	int Width(void) { return client_width_; }

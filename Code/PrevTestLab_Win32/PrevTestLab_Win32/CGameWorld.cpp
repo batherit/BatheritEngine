@@ -22,9 +22,12 @@ void CGameWorld::Update(float tick) {
 
 void CGameWorld::Render() {
 	//render the agents
-	for (unsigned int a = 0; a < agents_.size(); ++a)
-	{
+	for (unsigned int a = 0; a < agents_.size(); ++a){
 		agents_[a]->Render();
+	}
+
+	for (unsigned int o = 0; o < obstacles_.size(); ++o) {
+		obstacles_[o]->Render();
 	}
 }
 
@@ -34,6 +37,18 @@ void CGameWorld::RegisterAgents(std::vector<CGameObject*>& agents) {
 	}
 	agents_ = agents;
 }
+
+void CGameWorld::RegisterObstacles(std::vector<CGameObject*>& obstacles) {
+	for (int i = 0; i <  obstacles.size(); i++) {
+		obstacles[i]->EnterToGameWorld(this);
+	}
+	obstacles_ = obstacles;
+}
+
+void CGameWorld::RegisterWalls(std::vector<CWall2D>& walls) {
+	walls_ = walls;
+}
+
 void CGameWorld::ReleaseAgents(void) {
 	for (int i = 0; i < agents_.size(); i++) {
 		agents_[i]->ExitFromGameWorld();
