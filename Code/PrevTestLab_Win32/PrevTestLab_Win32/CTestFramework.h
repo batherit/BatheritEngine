@@ -40,6 +40,7 @@ inline void CTestFramework::Init(int cx, int cy) {
 		VehiclePrm.max_steering_force_			// max_force
 	);
 	p_test_object_->Steering()->SeekOn();
+	p_test_object_->Steering()->ObstacleAvoidanceOn();
 	p_test_object_->transform_.scale_ = CVector2D(50.0f, 50.0f);
 	
 	// »óÅÂ ±â°è ÄÄÆ÷³ÍÆ® ÀåÂø
@@ -48,7 +49,7 @@ inline void CTestFramework::Init(int cx, int cy) {
 
 	CGameMesh* p_mesh = new CGameMesh();
 	p_mesh->SetMeshVB(VehicleVB());
-	p_mesh->SetBoundingRad(1.5f);
+	p_mesh->SetBoundingRad(20.5f);
 	p_test_object_->SetMesh(p_mesh);
 	p_test_object_->RegisterRenderComponent(new CWIn32RenderComponent());
 

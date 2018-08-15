@@ -36,6 +36,7 @@ public:
 	void OffsetPursuitOn(CVehicle* v1, const CVector2D offset) { behavior_flags_ |= offset_pursuit;  p_target_agent1_ = v1; }
 	void EvadeOn(CVehicle* v) { behavior_flags_ |= evade; p_target_agent1_ = v; }
 	void WanderOn() { behavior_flags_ |= wander; }
+	void ObstacleAvoidanceOn() { behavior_flags_ |= obstacle_avoidance; }
 
 	// ~Off : 해당 행동을 비활성화시킨다.
 	void SeekOff() { if (On(seek)) behavior_flags_ ^= seek; }
@@ -45,6 +46,7 @@ public:
 	void OffsetPursuitOff() { if (On(offset_pursuit)) behavior_flags_ ^= offset_pursuit; }
 	void EvadeOff() { if (On(evade)) behavior_flags_ ^= evade; }
 	void WanderOff() { if (On(wander)) behavior_flags_ ^= wander; }
+	void ObstacleAvoidanceOff() { if (On(obstacle_avoidance)) behavior_flags_ ^= obstacle_avoidance; }
 
 private:
 	enum BEHAVIOR_TYPE
@@ -99,6 +101,7 @@ private:
 	float weight_offset_pursuit_;
 	float weight_evade_;
 	float weight_wander_;
+	float weight_obstacle_avoidance_;
 
 	// 포메이션이나 오프셋 추적에 사용되는 오프셋
 	CVector2D offset_;

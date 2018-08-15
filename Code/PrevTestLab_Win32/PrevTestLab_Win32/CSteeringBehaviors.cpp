@@ -16,6 +16,7 @@ CSteeringBehavior::CSteeringBehavior(CVehicle* agent) :
 	weight_offset_pursuit_(VehiclePrm.offset_pursuit_weight_),
 	weight_evade_(VehiclePrm.evade_weight_),
 	weight_wander_(VehiclePrm.wander_weight_),
+	weight_obstacle_avoidance_(VehiclePrm.obstacle_avoidance_weight_),
 	deceleration_(normal),
 	wander_distance_(WANDER_DIST),
 	wander_jitter_(WANDER_JITTER_PER_SEC),
@@ -226,7 +227,7 @@ CVector2D CSteeringBehavior::ObstacleAvoidance(const std::vector<CGameObject*>& 
 
 					float ip = cX - sqrt_part;
 
-					if (ip <= 0.0)
+					if (ip <= 0.0f)
 					{
 						ip = cX + sqrt_part;
 					}
@@ -285,7 +286,7 @@ CVector2D CSteeringBehavior::CalculateWeightedSum() {
 	}
 
 	if (On(obstacle_avoidance)) {
-		//TODO : obstacle_avoidance에 대한 행동 정의
+		v_steering_force_ += ObstacleAvoidance(p_vehicle_->GameWorld()->Obstacles()) * weight_obstacle_avoidance_;
 	}
 
 	CVector2D pick_point = p_vehicle_->GameWorld()->PickPoint();

@@ -9,7 +9,7 @@ public:
 	~CGameMesh();
 
 	void SetMeshVB(std::vector<CVector2D> meshVB) { meshVB_ = meshVB; }
-	void SetBoundingRad(float range) { bounding_radius_; }
+	void SetBoundingRad(float range) { bounding_radius_ = range; }
 
 	std::vector<CVector2D> GetMeshVB(void) { return meshVB_; }
 	float GetBoundingRad(void) { return bounding_radius_; }
