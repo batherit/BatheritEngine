@@ -3,6 +3,7 @@
 #include"CMathUtil.h"
 #include"CVehicleParamLoader.h"
 
+class CWall2D;
 class CVehicle;
 class CGameObject;
 
@@ -37,6 +38,7 @@ public:
 	void EvadeOn(CVehicle* v) { behavior_flags_ |= evade; p_target_agent1_ = v; }
 	void WanderOn() { behavior_flags_ |= wander; }
 	void ObstacleAvoidanceOn() { behavior_flags_ |= obstacle_avoidance; }
+	void WallAvoidanceOn() { behavior_flags_ |= wall_avoidance; }
 
 	// ~Off : 해당 행동을 비활성화시킨다.
 	void SeekOff() { if (On(seek)) behavior_flags_ ^= seek; }
@@ -47,6 +49,7 @@ public:
 	void EvadeOff() { if (On(evade)) behavior_flags_ ^= evade; }
 	void WanderOff() { if (On(wander)) behavior_flags_ ^= wander; }
 	void ObstacleAvoidanceOff() { if (On(obstacle_avoidance)) behavior_flags_ ^= obstacle_avoidance; }
+	void WallAvoidanceOff() { if (On(wall_avoidance)) behavior_flags_ ^= wall_avoidance; }
 
 private:
 	enum BEHAVIOR_TYPE
@@ -81,6 +84,12 @@ private:
 	// 에이전트가 가려고 하는 'wander 원'의 현재 좌표.
 	CVector2D wander_target_;
 
+	//a vertex buffer to contain the feelers rqd for wall avoidance  
+	std::vector<CVector2D> feelers_;
+
+	//the length of the 'feeler/s' used in wall detection
+	float wall_detection_feeler_length_;    
+
 	// 장애물 회피에 사용되는 감지 상자의 길이
 	float detection_box_length_;
 
@@ -102,6 +111,7 @@ private:
 	float weight_evade_;
 	float weight_wander_;
 	float weight_obstacle_avoidance_;
+	float weight_wall_avoidance_;
 
 	// 포메이션이나 오프셋 추적에 사용되는 오프셋
 	CVector2D offset_;
@@ -146,6 +156,10 @@ private:
 	// 이것은 에이전트가 직면하는 몇몇 장애물들과 멀어지도록하는 조종력을
 	// 반환하도록 합니다.
 	CVector2D ObstacleAvoidance(const std::vector<CGameObject*>& obstacles);
+
+	//this returns a steering force which will keep the agent away from any
+	//walls it may encounter
+	CVector2D WallAvoidance(const std::vector<CWall2D> &walls);
 
 	// 활성화된 몇가지 행동들에서 조종힘을 계산하고 더한다.
 	CVector2D CalculateWeightedSum();

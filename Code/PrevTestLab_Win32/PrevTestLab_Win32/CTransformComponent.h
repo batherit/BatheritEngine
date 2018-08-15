@@ -156,3 +156,19 @@ inline CVector2D VectorToWorldSpace(const CVector2D &vec,
 
 	return trans_vec;
 }
+
+//-------------------------- Vec2DRotateAroundOrigin --------------------------
+//
+//  rotates a vector ang rads around the origin
+//-----------------------------------------------------------------------------
+inline void Vec2DRotateAroundOrigin(CVector2D& v, float ang)
+{
+	//create a transformation matrix
+	C2DMatrix mat;
+
+	//rotate
+	mat.Rotate(ang);
+
+	//now transform the object's vertices
+	mat.TransformVector2Ds(v);
+}

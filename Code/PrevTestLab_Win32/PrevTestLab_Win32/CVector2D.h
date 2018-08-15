@@ -68,11 +68,11 @@ public:
 	float y_;
 };
 
-inline CVector2D operator*(const CVector2D &lhs, double rhs);
-inline CVector2D operator*(double lhs, const CVector2D &rhs);
+inline CVector2D operator*(const CVector2D &lhs, float rhs);
+inline CVector2D operator*(float lhs, const CVector2D &rhs);
 inline CVector2D operator-(const CVector2D &lhs, const CVector2D &rhs);
 inline CVector2D operator+(const CVector2D &lhs, const CVector2D &rhs);
-inline CVector2D operator/(const CVector2D &lhs, double val);
+inline CVector2D operator/(const CVector2D &lhs, float val);
 std::ostream& operator<<(std::ostream& os, const CVector2D& rhs);
 std::ifstream& operator>>(std::ifstream& is, CVector2D& lhs);
 
@@ -106,6 +106,15 @@ inline CVector2D Vec2DNormalize(const CVector2D &v) {
 	}
 
 	return vec;
+}
+
+inline float Vec2DDistance(const CVector2D &v1, const CVector2D &v2)
+{
+
+	float ySeparation = v2.y_ - v1.y_;
+	float xSeparation = v2.x_ - v1.x_;
+
+	return sqrt(ySeparation*ySeparation + xSeparation * xSeparation);
 }
 
 inline float CVector2D::Dot(const CVector2D& v2) const {

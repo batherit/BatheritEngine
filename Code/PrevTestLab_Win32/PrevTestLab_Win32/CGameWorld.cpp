@@ -29,6 +29,11 @@ void CGameWorld::Render() {
 	for (unsigned int o = 0; o < obstacles_.size(); ++o) {
 		obstacles_[o]->Render();
 	}
+
+	for (unsigned int w = 0; w<walls_.size(); ++w)
+	{
+		walls_[w].Render(true);  //true flag shows normals
+	}
 }
 
 void CGameWorld::RegisterAgents(std::vector<CGameObject*>& agents) {

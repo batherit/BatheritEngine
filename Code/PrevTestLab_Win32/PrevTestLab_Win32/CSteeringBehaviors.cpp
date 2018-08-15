@@ -1,5 +1,6 @@
 #include<algorithm>
 #include "CSteeringBehaviors.h"
+#include "CObjectFuncTemplates.h"
 #include"CUtil.h"
 #include "CGameTimer.h"
 #include "CGameObject.h"
@@ -17,6 +18,9 @@ CSteeringBehavior::CSteeringBehavior(CVehicle* agent) :
 	weight_evade_(VehiclePrm.evade_weight_),
 	weight_wander_(VehiclePrm.wander_weight_),
 	weight_obstacle_avoidance_(VehiclePrm.obstacle_avoidance_weight_),
+	weight_wall_avoidance_(VehiclePrm.wall_avoidance_weight_),
+	wall_detection_feeler_length_(VehiclePrm.wall_detection_feeler_length_),
+	feelers_(3),
 	deceleration_(normal),
 	wander_distance_(WANDER_DIST),
 	wander_jitter_(WANDER_JITTER_PER_SEC),
@@ -40,6 +44,21 @@ CVector2D CSteeringBehavior::Calculate() {
 	v_steering_force_ = CalculateWeightedSum();
 
 	return v_steering_force_;
+}
+
+void CSteeringBehavior::CreateFeelers() {
+	//feeler pointing straight in front
+	feelers_[0] = p_vehicle_->transform_.pos_ + wall_detection_feeler_length_ * p_vehicle_->transform_.look_;
+
+	//feeler to left
+	CVector2D temp = p_vehicle_->transform_.look_;
+	Vec2DRotateAroundOrigin(temp, HalfPi * 3.5f);
+	feelers_[1] = p_vehicle_->transform_.pos_ + wall_detection_feeler_length_ / 2.0f * temp;
+
+	//feeler to right
+	temp = p_vehicle_->transform_.look_;
+	Vec2DRotateAroundOrigin(temp, HalfPi * 0.5f);
+	feelers_[2] = p_vehicle_->transform_.pos_ + wall_detection_feeler_length_ / 2.0f * temp;
 }
 
 //this behavior moves the agent towards a target position
@@ -275,6 +294,64 @@ CVector2D CSteeringBehavior::ObstacleAvoidance(const std::vector<CGameObject*>& 
 		p_vehicle_->transform_.right_);
 }
 
+CVector2D CSteeringBehavior::WallAvoidance(const std::vector<CWall2D> &walls) {
+	//the feelers are contained in a std::vector, m_Feelers
+	CreateFeelers();
+
+	float dist_to_this_IP = 0.0f;
+	float dist_to_closest_IP = MaxDouble;
+
+	//this will hold an index into the vector of walls
+	int closest_wall = -1;
+
+	CVector2D steering_force,
+		point,         //used for storing temporary info
+		closest_point;  //holds the closest intersection point
+
+					   //examine each feeler in turn
+	for (unsigned int flr = 0; flr<feelers_.size(); ++flr)
+	{
+		//run through each wall checking for any intersection points
+		for (unsigned int w = 0; w<walls.size(); ++w)
+		{
+			if (LineIntersection2D(p_vehicle_->transform_.pos_,
+				feelers_[flr],
+				walls[w].From(),
+				walls[w].To(),
+				dist_to_this_IP,
+				point))
+			{
+				//is this the closest found so far? If so keep a record
+				if (dist_to_this_IP < dist_to_closest_IP)
+				{
+					dist_to_closest_IP = dist_to_this_IP;
+
+					closest_wall = w;
+
+					closest_point = point;
+				}
+			}
+		}//next wall
+
+
+		 //if an intersection point has been detected, calculate a force  
+		 //that will direct the agent away
+		if (closest_wall >= 0)
+		{
+			//calculate by what distance the projected position of the agent
+			//will overshoot the wall
+			CVector2D over_shoot = feelers_[flr] - closest_point;
+
+			//create a force in the direction of the wall normal, with a 
+			//magnitude of the overshoot
+			steering_force = walls[closest_wall].Normal() * over_shoot.Length();
+		}
+
+	}//next feeler
+
+	return steering_force;
+}
+
 //---------------------- CalculateWeightedSum ----------------------------
 //
 // 이것은 단순히 모든 '활성화된 동작들 * 가중치'를 합하고 
@@ -282,7 +359,7 @@ CVector2D CSteeringBehavior::ObstacleAvoidance(const std::vector<CGameObject*>& 
 //------------------------------------------------------------------------
 CVector2D CSteeringBehavior::CalculateWeightedSum() {
 	if (On(wall_avoidance)) {
-		//TODO : wall_aboidance에 대한 행동 정의
+		v_steering_force_ += WallAvoidance(p_vehicle_->GameWorld()->Walls()) * weight_wall_avoidance_;
 	}
 
 	if (On(obstacle_avoidance)) {

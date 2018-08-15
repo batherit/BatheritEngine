@@ -117,23 +117,23 @@
     <ClInclude Include="CRenderComponent.h">
       <Filter>소스 파일\Framework</Filter>
     </ClInclude>
-    <ClInclude Include="CIniFileLoaderBase.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="CVehicleParamLoader.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="CObjectFuncTemplates.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="CGameMesh.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="CAudioComponent.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>소스 파일\Framework</Filter>
     </ClInclude>
     <ClInclude Include="CFMOD.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>소스 파일\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="CGameMesh.h">
+      <Filter>소스 파일\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="CIniFileLoaderBase.h">
+      <Filter>소스 파일\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="CObjectFuncTemplates.h">
+      <Filter>소스 파일\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="CVehicleParamLoader.h">
+      <Filter>소스 파일\Framework</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -236,23 +236,23 @@
     <ClCompile Include="CRenderComponent.cpp">
       <Filter>소스 파일\Framework</Filter>
     </ClCompile>
-    <ClCompile Include="CIniFileLoaderBase.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="CVehicleParamLoader.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="CObjectFuncTemplates.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="CGameMesh.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="CAudioComponent.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>소스 파일\Framework</Filter>
     </ClCompile>
     <ClCompile Include="CFMOD.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>소스 파일\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="CGameMesh.cpp">
+      <Filter>소스 파일\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="CIniFileLoaderBase.cpp">
+      <Filter>소스 파일\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="CObjectFuncTemplates.cpp">
+      <Filter>소스 파일\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="CVehicleParamLoader.cpp">
+      <Filter>소스 파일\Framework</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

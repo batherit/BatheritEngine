@@ -80,3 +80,50 @@ inline bool TwoCirclesOverlapped(CVector2D c1, float r1,
 
 	return false;
 }
+
+//-------------------- LineIntersection2D-------------------------
+//
+//	Given 2 lines in 2D space AB, CD this returns true if an 
+//	intersection occurs and sets dist to the distance the intersection
+//  occurs along AB. Also sets the 2d vector point to the point of
+//  intersection
+//----------------------------------------------------------------- 
+inline bool LineIntersection2D(CVector2D   A,
+	CVector2D   B,
+	CVector2D   C,
+	CVector2D   D,
+	float&     dist,
+	CVector2D&  point)
+{
+
+	float rTop = (A.y_ - C.y_)*(D.x_ - C.x_) - (A.x_ - C.x_)*(D.y_ - C.y_);
+	float rBot = (B.x_ - A.x_)*(D.y_ - C.y_) - (B.y_ - A.y_)*(D.x_ - C.x_);
+
+	float sTop = (A.y_ - C.y_)*(B.x_ - A.x_) - (A.x_ - C.x_)*(B.y_ - A.y_);
+	float sBot = (B.x_ - A.x_)*(D.y_ - C.y_) - (B.y_ - A.y_)*(D.x_ - C.x_);
+
+	if ((rBot == 0) || (sBot == 0))
+	{
+		//lines are parallel
+		return false;
+	}
+
+	double r = rTop / rBot;
+	double s = sTop / sBot;
+
+	if ((r > 0) && (r < 1) && (s > 0) && (s < 1))
+	{
+		dist = Vec2DDistance(A, B) * r;
+
+		point = A + r * (B - A);
+
+		return true;
+	}
+
+	else
+	{
+		dist = 0;
+
+		return false;
+	}
+}

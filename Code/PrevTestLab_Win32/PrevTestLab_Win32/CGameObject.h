@@ -25,10 +25,13 @@ public:
 		renderer_(nullptr),
 		playground_(nullptr), 
 		is_tagged_(false) {
-		SetID(ID);
-		memset(components_, '\0', sizeof(components_));
-		// 게임 객체는 생성되면 자동으로 게임 객체 관리자에 등록된다.
-		GameObjectMgr->RegisterObject(this);
+
+		if (ID != -1) {
+			SetID(ID);
+			memset(components_, '\0', sizeof(components_));
+			// 게임 객체는 생성되면 자동으로 게임 객체 관리자에 등록된다.
+			GameObjectMgr->RegisterObject(this);
+		}
 	}
 	virtual ~CGameObject();
 

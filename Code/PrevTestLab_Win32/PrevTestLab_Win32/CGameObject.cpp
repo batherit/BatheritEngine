@@ -8,7 +8,7 @@ int CGameObject::next_valid_ID_ = 0;
 
 CGameObject::~CGameObject()
 {
-
+	next_valid_ID_--;
 }
 
 void CGameObject::RegisterComponent(CGameComponent* p_component) {

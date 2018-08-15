@@ -1,4 +1,5 @@
 #pragma once
+#include "CWin32GDI.h"
 #include "CVector2D.h"
 #include <fstream>
 
@@ -15,7 +16,7 @@ public:
 
 	virtual void Render(bool RenderNormals = false)const
 	{
-		//TODO : gdi->Line(m_vA, m_vB);
+		gdi->Line(v_A_, v_B_);
 
 		//render the normals if rqd
 		if (RenderNormals)
@@ -23,7 +24,7 @@ public:
 			int MidX = (int)((v_A_.x_ + v_B_.x_) / 2);
 			int MidY = (int)((v_A_.y_ + v_B_.y_) / 2);
 
-			// TODO : gdi->Line(MidX, MidY, (int)(MidX + (v_N_.x_ * 5)), (int)(MidY + (v_N_.y_ * 5)));
+			gdi->Line(MidX, MidY, (int)(MidX + (v_N_.x_ * 5)), (int)(MidY + (v_N_.y_ * 5)));
 		}
 	}
 
@@ -51,7 +52,15 @@ public:
 
 	void Read(std::ifstream& in) {
 		float x, y;
+
 		in >> x >> y;
+		SetFrom(CVector2D(x, y));
+
+		in >> x >> y;
+		SetTo(CVector2D(x, y));
+
+		in >> x >> y;
+		SetNormal(CVector2D(x, y));
 	}
 
 protected:
