@@ -166,6 +166,7 @@
     <ClInclude Include="CIniFileLoaderBase.h" />
     <ClInclude Include="CMathUtil.h" />
     <ClInclude Include="CObjectFuncTemplates.h" />
+    <ClInclude Include="CPath2D.h" />
     <ClInclude Include="CPhysicsComponent.h" />
     <ClInclude Include="CRenderComponent.h" />
     <ClInclude Include="CSteeringBehaviors.h" />
@@ -217,6 +218,7 @@
     <ClCompile Include="CIniFileLoaderBase.cpp" />
     <ClCompile Include="CMathUtil.cpp" />
     <ClCompile Include="CObjectFuncTemplates.cpp" />
+    <ClCompile Include="CPath2D.cpp" />
     <ClCompile Include="CPhysicsComponent.cpp" />
     <ClCompile Include="CRenderComponent.cpp" />
     <ClCompile Include="CSteeringBehaviors.cpp" />

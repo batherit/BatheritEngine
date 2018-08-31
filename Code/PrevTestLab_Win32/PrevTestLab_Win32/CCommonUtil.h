@@ -23,7 +23,12 @@ inline int   RandInt(int x, int y) {
 	assert(y >= x && "<RandInt>: y is less than x");
 	return rand() % (y - x + 1) + x;
 }
+
 inline float RandFloat() { return ((rand()) / (RAND_MAX + 1.0f)); }
+
+inline float RandInRange(float x, float y) {
+	return x + RandFloat() * (y - x);
+}
 
 //returns a random float in the range -1 < n < 1
 inline float RandomClamped() { return RandFloat() - RandFloat(); }

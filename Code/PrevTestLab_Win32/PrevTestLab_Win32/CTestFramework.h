@@ -112,8 +112,8 @@ inline void CTestFramework::Init(int cx, int cy) {
 	// 벽을 생성한다.
 	std::vector<CWall2D> walls;
 
-	float border_size = 20.0;
-	float corner_size = 0.2;
+	float border_size = 20.0f;
+	float corner_size = 0.2f;
 	float v_dist = cy - 2 * border_size;
 	float h_dist = cx - 2 * border_size;
 

@@ -19,21 +19,23 @@ CSteeringBehavior::CSteeringBehavior(CVehicle* agent) :
 	weight_wander_(VehiclePrm.wander_weight_),
 	weight_obstacle_avoidance_(VehiclePrm.obstacle_avoidance_weight_),
 	weight_wall_avoidance_(VehiclePrm.wall_avoidance_weight_),
+	weight_follow_path_(VehiclePrm.follow_path_weight_),
+	view_distance_(VehiclePrm.view_distance_),
 	wall_detection_feeler_length_(VehiclePrm.wall_detection_feeler_length_),
 	feelers_(3),
 	deceleration_(normal),
 	wander_distance_(WANDER_DIST),
 	wander_jitter_(WANDER_JITTER_PER_SEC),
 	wander_radius_(WANDER_RAD),
+	waypoint_seek_dist_sq_(WAY_POINT_SEEK_DIST * WAY_POINT_SEEK_DIST),
 	p_target_agent1_(nullptr),
 	p_target_agent2_(nullptr)
 {
 	float theta = RandFloat() * TwoPi;
 	wander_target_ = CVector2D(wander_radius_ * cos(theta), wander_radius_ * sin(theta));
 
-	// TODO : Path = new Path();
-	// TODO : Path->LoopOn();
-	
+	p_path_ = new CPath2D();
+	p_path_->LoopOn();
 }
 
 CVector2D CSteeringBehavior::Calculate() {
@@ -299,7 +301,7 @@ CVector2D CSteeringBehavior::WallAvoidance(const std::vector<CWall2D> &walls) {
 	CreateFeelers();
 
 	float dist_to_this_IP = 0.0f;
-	float dist_to_closest_IP = MaxDouble;
+	float dist_to_closest_IP = MaxFloat;
 
 	//this will hold an index into the vector of walls
 	int closest_wall = -1;
@@ -350,6 +352,33 @@ CVector2D CSteeringBehavior::WallAvoidance(const std::vector<CWall2D> &walls) {
 	}//next feeler
 
 	return steering_force;
+}
+
+//------------------------------- FollowPath -----------------------------
+//
+// 일련의 벡터 집합(웨이 포인트)을 가지고서, 이 메서드는 순서대로 웨이포인트를 따라 에이전트를 움직이는
+//  힘을 생성한다. 에이전트를 다음 웨이 포인트로 이동하기 위하여 'Seek'행동을
+// 사용한다. 마지막 웨이 포인트에 대해선 'Arrive'행동을 사용한다.
+//------------------------------------------------------------------------
+CVector2D CSteeringBehavior::FollowPath()
+{
+	// 현재 목표에 충분히 근접하면 다음 목표로 이동
+	// (거리 제곱 공간에서 작업)
+	if (Vec2DDistanceSq(p_path_->CurrentWaypoint(), p_vehicle_->transform_.pos_) <
+		waypoint_seek_dist_sq_)
+	{
+		p_path_->SetNextWaypoint();
+	}
+
+	if (!p_path_->Finished())
+	{
+		return Seek(p_path_->CurrentWaypoint());
+	}
+
+	else
+	{
+		return Arrive(p_path_->CurrentWaypoint(), normal);
+	}
 }
 
 //---------------------- CalculateWeightedSum ----------------------------
@@ -406,6 +435,11 @@ CVector2D CSteeringBehavior::CalculateWeightedSum() {
 
 	if (On(wander)){
 		v_steering_force_ += Wander() * weight_wander_;
+	}
+
+	if (On(follow_path))
+	{
+		v_steering_force_ += FollowPath() * weight_follow_path_;
 	}
 
 	v_steering_force_.Truncate(p_vehicle_->physics_->MaxForce());

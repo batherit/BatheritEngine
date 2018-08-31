@@ -172,7 +172,7 @@ inline double Vec2DDistanceSq(const CVector2D &v1, const CVector2D &v2)
 }
 
 inline void CVector2D::Reflect(const CVector2D& norm) {
-	*this += 2.0 * this->Dot(norm) * norm.GetReverse();
+	*this += 2.0f * this->Dot(norm) * norm.GetReverse();
 }
 
 inline CVector2D CVector2D::GetReverse() const {

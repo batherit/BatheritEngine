@@ -108,8 +108,8 @@ inline bool LineIntersection2D(CVector2D   A,
 		return false;
 	}
 
-	double r = rTop / rBot;
-	double s = sTop / sBot;
+	float r = rTop / rBot;
+	float s = sTop / sBot;
 
 	if ((r > 0) && (r < 1) && (s > 0) && (s < 1))
 	{
