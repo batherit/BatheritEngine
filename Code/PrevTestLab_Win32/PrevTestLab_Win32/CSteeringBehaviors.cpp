@@ -20,6 +20,8 @@ CSteeringBehavior::CSteeringBehavior(CVehicle* agent) :
 	weight_obstacle_avoidance_(VehiclePrm.obstacle_avoidance_weight_),
 	weight_wall_avoidance_(VehiclePrm.wall_avoidance_weight_),
 	weight_follow_path_(VehiclePrm.follow_path_weight_),
+	weight_interpose_(VehiclePrm.interpose_weight_),
+	weight_hide_(VehiclePrm.hide_weight_),
 	view_distance_(VehiclePrm.view_distance_),
 	wall_detection_feeler_length_(VehiclePrm.wall_detection_feeler_length_),
 	feelers_(3),
@@ -69,6 +71,235 @@ CVector2D CSteeringBehavior::Seek(CVector2D target_pos) {
 		* p_vehicle_->physics_->MaxSpeed();
 
 	return (desired_velocity - p_vehicle_->physics_->Velocity());
+}
+
+//---------------------------- 분할 --------------------------------
+//
+// 이것은 다른 이웃들로부터 반발하는 힘들 계산한다.
+//------------------------------------------------------------------------
+CVector2D CSteeringBehavior::Separation(const vector<CVehicle*> &neighbors)
+{
+	CVector2D steering_force;
+
+	for (unsigned int a = 0; a<neighbors.size(); ++a)
+	{
+		// 해당 에이전트가 계산에 포함되지 않으며, 조사하는 에이전트가 충분히 가까이
+		// 있음을 확인한다. *** 또한 이것이 회피 대상을 포함하지 않는 것을 확인한다.
+		if ((neighbors[a] != p_vehicle_) && neighbors[a]->IsTagged() &&
+			(neighbors[a] != p_target_agent1_))
+		{
+			CVector2D ToAgent = p_vehicle_->transform_.pos_ - neighbors[a]->transform_.pos_;
+
+			// 이웃으로부터 떨어진 에이전트 거리에 역비례하여 힘을 조정한다.
+			steering_force += Vec2DNormalize(ToAgent) / ToAgent.Length();
+		}
+	}
+
+	return steering_force;
+}
+
+
+//---------------------------- 정렬 ---------------------------------
+//
+//  이웃들에 향하는 에이전트들을 정렬하도록하는 
+//  힘을 반환한다.
+//------------------------------------------------------------------------
+CVector2D CSteeringBehavior::Alignment(const vector<CVehicle*>& neighbors)
+{
+	// 이웃들의 평균 헤딩 벡터를 기록하는데 사용된다.
+	CVector2D average_heading;
+
+	// 이웃에 있는 비히클의 수를 세는데 쓰인다.
+	int    neighbor_count = 0;
+
+	// 모든 태그된 비히클들을 순회하고 그들의 헤딩 벡터들을 합한다. 
+	for (unsigned int a = 0; a<neighbors.size(); ++a)
+	{
+		// 해당 에이전트가 계산에 포함되지 않으며, 조사되는 에이전트가 충분히 가까이
+		// 있음을 확인한다. *** 또한 이것은 회피 타겟을 포함하지 않음을 확인한다.***
+
+		if ((neighbors[a] != p_vehicle_) && neighbors[a]->IsTagged() &&
+			(neighbors[a] != p_target_agent1_))
+		{
+			average_heading += neighbors[a]->transform_.look_;
+
+			++neighbor_count;
+		}
+	}
+
+	// 이웃이 하나 이상의 비히클들을 포함한다면, 그들의 헤딩 벡터들을
+	// 평균한다.
+	if (neighbor_count > 0)
+	{
+		average_heading /= (float)neighbor_count;
+
+		average_heading -= p_vehicle_->transform_.look_;
+	}
+
+	// 비히클을 이웃들의 평균 헤딩 벡터가 가리키는 곳으로 향하게 된다.
+	return average_heading;
+}
+
+//-------------------------------- 결합 ------------------------------
+//
+//  즉각 지역에서 '군중의 중심'을 향하도록 에이전트를 움직이도록하는
+//  조종힘을 반환한다.
+//------------------------------------------------------------------------
+CVector2D CSteeringBehavior::Cohesion(const vector<CVehicle*> &neighbors)
+{
+	// 첫째로 군중의 중심을 찾는다.
+	CVector2D center_of_mass, steering_force;
+
+	int neighbor_count = 0;
+
+	// 이웃들을 순회하고 모든 위치 벡터들을 더한다.
+	for (unsigned int a = 0; a<neighbors.size(); ++a)
+	{
+		// 해당 에이전트가 계산에 포함되지 않고 조사되는 에이전트가 충분히 가까움을 
+		// 확인한다. ***또한 이것이 회피 대상을 포함하지 않음을 확인한다. ***
+		if ((neighbors[a] != p_vehicle_) && neighbors[a]->IsTagged() &&
+			(neighbors[a] != p_target_agent1_))
+		{
+			center_of_mass += neighbors[a]->transform_.pos_;
+
+			++neighbor_count;
+		}
+	}
+
+	if (neighbor_count > 0)
+	{
+		// 질량 중심은 위치 좌표 합에 대한 평균이다.
+		center_of_mass /= (float)neighbor_count;
+
+		// 현재 그 좌표를 향해 '찾기'행동을 수행한다.
+		steering_force = Seek(center_of_mass);
+	}
+
+	// 결합의 정도는 보통 분리 또는 정렬에 대한 경우보다 크기 때문에 
+	// 보통 이것을 정규화한다.(?)
+	return Vec2DNormalize(steering_force);
+}
+
+
+/* 주의: 다음 세 가지 행동은 위와 같다. 다만 이웃을 찾기 위해 셀 공간 분할을 
+사용한다는 점에서 다르다.*/
+
+
+//---------------------------- Separation --------------------------------
+//
+// 다른 이웃들에 반발하는 힘을 계산한다.
+//
+//  공간 분할을 사용한다.
+//------------------------------------------------------------------------
+CVector2D CSteeringBehavior::SeparationPlus(const vector<CVehicle*> &neighbors)
+{
+	CVector2D steering_force;
+
+	// 이웃들을 순회하며, 모든 위치 벡터를 합한다.
+	for (CGameObject* pV = p_vehicle_->GameWorld()->CellSpace()->begin();
+		!p_vehicle_->GameWorld()->CellSpace()->end();
+		pV = p_vehicle_->GameWorld()->CellSpace()->next())
+	{
+		// 해당 에이전트가 계산에 포함되지 않으며, 조사되는 에이전트가
+		// 충분히 가까움을 확인한다.
+		if (pV != p_vehicle_)
+		{
+			CVector2D to_agent = p_vehicle_->transform_.pos_ - pV->transform_.pos_;
+
+			// 에이전트가 이웃에 떨어진 정도에 역비례하여 힘을 조정한다.
+			steering_force += Vec2DNormalize(to_agent) / to_agent.Length();
+		}
+
+	}
+
+	return steering_force;
+}
+//---------------------------- Alignment ---------------------------------
+//
+//  이웃들의 헤딩 벡터로 에이전트 헤딩 벡터를 
+//  정렬하려는 힘을 반환한다.
+//
+//  공간 분할을 사용한다.
+//------------------------------------------------------------------------
+CVector2D CSteeringBehavior::AlignmentPlus(const vector<CVehicle*> &neighbors)
+{
+	// 이것은 이웃들의 평균 헤딩 벡터를 기록한다.
+	CVector2D average_heading;
+
+	// 이것은 이웃한 비히클들의 수를 센다.
+	float    neighbor_count = 0.0f;
+
+	// 이웃들을 순회하며 모든 위치 좌표들을 합한다.
+	for (CGameObject* pV = p_vehicle_->GameWorld()->CellSpace()->begin();
+		!p_vehicle_->GameWorld()->CellSpace()->end();
+		pV = p_vehicle_->GameWorld()->CellSpace()->next())
+	{
+		// 해당 에이전트가 계산에 포함되지 않으며 조사되는 에이전트가
+		// 충분히 가까이 있음을 확인한다.
+		if (pV != p_vehicle_)
+		{
+			average_heading += pV->transform_.look_;
+
+			++neighbor_count;
+		}
+
+	}
+
+	// 이웃이 하나 이상이라면, 그들의 헤딩 벡터를 
+	// 평균한다.
+	if (neighbor_count > 0.0f)
+	{
+		average_heading /= neighbor_count;
+
+		average_heading -= p_vehicle_->transform_.look_;
+	}
+
+	return average_heading;
+}
+
+
+//-------------------------------- Cohesion ------------------------------
+//
+//  즉시 지역에서 군중 중심에 향하도록 에이전트를 움직이려는 조종력을
+//  반환한다.
+//
+//  공간 분할을 사용한다.
+//------------------------------------------------------------------------
+CVector2D CSteeringBehavior::CohesionPlus(const vector<CVehicle*> &neighbors)
+{
+	// 첫째로 군중 중심을 찾는다.
+	CVector2D center_of_mass, steering_force;
+
+	int neighbor_count = 0;
+
+	// 이웃들을 순회하며 모든 위치 벡터를 합한다.
+	for (CGameObject* pV = p_vehicle_->GameWorld()->CellSpace()->begin();
+		!p_vehicle_->GameWorld()->CellSpace()->end();
+		pV = p_vehicle_->GameWorld()->CellSpace()->next())
+	{
+		// 해당 에이전트가 계산에 포함되지 않으며, 조사되는 에이전트가 충분히
+		// 가까이 있음을 확인한다.
+		if (pV != p_vehicle_)
+		{
+			center_of_mass += pV->transform_.pos_;
+
+			++neighbor_count;
+		}
+	}
+
+	if (neighbor_count > 0)
+	{
+		// 군중 중심은 위치 벡터 합에 대한 평균이다.
+		center_of_mass /= (float)neighbor_count;
+
+		// 그곳으로 향한 '찾기'행동을 수행한다.
+		//now seek towards that position
+		steering_force = Seek(center_of_mass);
+	}
+
+	// 결합의 정도는 보통 분할 또는 정렬보다 크기 때문에
+	// 보통 이것을 정규화한다. (?)
+	return Vec2DNormalize(steering_force);
 }
 
 //this behavior returns a vector that moves the agent away
@@ -142,6 +373,29 @@ CVector2D CSteeringBehavior::Pursuit(const CVehicle* evader) {
 
 	// 이제 도피자가 있을 것으로 예측된 미래 위치로 찾아간다.
 	return Seek(evader->transform_.pos_ + evader->physics_->Velocity() * look_ahead_time);
+}
+
+//------------------------- Offset Pursuit -------------------------------
+//
+//  리더 비히클로부터 특정된 오프셋으로 비히클을 두려는 조종힘을 
+//  만들어낸다.
+//------------------------------------------------------------------------
+CVector2D CSteeringBehavior::OffsetPursuit(const CVehicle* leader, const CVector2D offset) {
+	// 월드 공간에서의 오프셋 위치를 구한다.
+	CVector2D world_offset_pos = PointToWorldSpace(offset,
+		leader->transform_.look_,
+		leader->transform_.right_,
+		leader->transform_.pos_);
+
+	CVector2D to_offset = world_offset_pos - p_vehicle_->transform_.pos_;
+
+	// 예측되는 시간은 리더와 추적자 사이의
+	// 거리에 비례하며, 두 에이전트 속도합에 반비례한다.
+	float lookahead_time = to_offset.Length() /
+		(p_vehicle_->physics_->MaxSpeed() + leader->physics_->Speed());
+
+	// 오프셋의 예상되는 미래 위치로 도착하게끔 한다.
+	return Arrive(world_offset_pos + leader->physics_->Velocity() * lookahead_time, fast);
 }
 
 //this behavior attempts to evade a pursuer
@@ -381,6 +635,102 @@ CVector2D CSteeringBehavior::FollowPath()
 	}
 }
 
+//--------------------------- Interpose ----------------------------------
+//
+//  두 개의 에이전트가 주어진다면, 이 메서드는 그들 사이에 비히클을
+//  위치시키려는 힘을 반환한다.
+//------------------------------------------------------------------------
+CVector2D CSteeringBehavior::Interpose(const CVehicle* vehicleA, const CVehicle* vehicleB) {
+	// 첫째로, 우리는 두 에이전트가 미래의 시간 T에 대하여 어디로 갈지에 대해 파악할 
+	// 필요가 있다. 이것은 최대 속도에서 현재 시간에 대하여 중앙 지점으로 도달하기까지
+	// 걸리는 시간을 결정함으로써 근사할 수 있다.
+	CVector2D mid_point = (vehicleA->transform_.pos_ + vehicleB->transform_.pos_) / 2.0f;
+
+	float time_to_reach_mid_point = Vec2DDistance(p_vehicle_->transform_.pos_, mid_point) /
+		p_vehicle_->physics_->MaxSpeed();
+
+	// 이를 통해 시간 T를 가지게 되었다. 우리는 에이전트와 A와 B가 계속 직선 궤적에
+	// 있을 것이라 가정하고 그들의 미래 위치를 추론한다.
+	CVector2D posA = vehicleA->transform_.pos_ + vehicleA->physics_->Velocity() * time_to_reach_mid_point;
+	CVector2D posB = vehicleB->transform_.pos_ + vehicleB->physics_->Velocity() * time_to_reach_mid_point;
+
+	// 예상된 지점들의 중앙값을 계산한다.
+	mid_point = (posA + posB) / 2.0f;
+
+	// 그곳에 도착하도록 조종한다.
+	return Arrive(mid_point, fast);
+}
+
+//--------------------------- Hide ---------------------------------------
+//
+//------------------------------------------------------------------------
+CVector2D CSteeringBehavior::Hide(const CVehicle* hunter,
+	const vector<CGameObject*>& obstacles)
+{
+	float dist_to_closest = MaxFloat;
+	CVector2D best_hiding_spot;
+
+	std::vector<CGameObject*>::const_iterator curOb = obstacles.begin();
+	std::vector<CGameObject*>::const_iterator closest;
+
+	while (curOb != obstacles.end())
+	{
+		// 해당 장애물에 대하여 숨을 곳의 위치를 계산한다.
+		CVector2D hiding_spot = GetHidingPosition((*curOb)->transform_.pos_,
+			(*curOb)->Mesh()->GetBoundingRad(),
+			hunter->transform_.pos_);
+
+		// 에이전트에서 가장 가까운 숨을 장소를 찾기 위해 거리 제곱 공간에서
+		// 작동한다.
+		float dist = Vec2DDistanceSq(hiding_spot, p_vehicle_->transform_.pos_);
+
+		if (dist < dist_to_closest)
+		{
+			dist_to_closest = dist;
+
+			best_hiding_spot = hiding_spot;
+
+			closest = curOb;
+		}
+
+		++curOb;
+
+	}// while문 끝
+
+	// 적절한 장애물들을 찾지 못했다면, 헌터를 피하도록 한다.
+	 //if no suitable obstacles found then Evade the hunter
+	if (dist_to_closest == MaxFloat)
+	{
+		return Evade(hunter);
+	}
+
+	// 그렇지 않다면 숨을 장소로 '도착하기'를 사용한다.
+	return Arrive(best_hiding_spot, fast);
+}
+
+//------------------------- GetHidingPosition ----------------------------
+//
+//  헌터의 위치, 비히클의 위치, 그리고 장애물의 둘레가 주어진다면,
+//  해당 메서드는 바운딩 반지름만큼 떨어진 그리고 헌터에 정반대편에 있는 경계선의 위치를
+//  계산한다.
+//------------------------------------------------------------------------
+CVector2D CSteeringBehavior::GetHidingPosition(const CVector2D& posOb,
+	const float     radiusOb,
+	const CVector2D& posHunter)
+{
+	// 에이전트가 선택된 장애물의 바운딩 반지름에 얼마만큼 떨어져있는지를
+	// 계산한다.
+	const float distance_from_boundary = 30.0f;
+	float dist_away = radiusOb + distance_from_boundary;
+
+	// 헌터에서 오브젝트로 향하는 헤딩 벡터를 계산한다.
+	CVector2D ToOb = Vec2DNormalize(posOb - posHunter);
+
+	// 크기를 조정하고 장애물 위치에 추가하여 숨는 지점을
+	// 찾아낸다.
+	return (ToOb * dist_away) + posOb;
+}
+
 //---------------------- CalculateWeightedSum ----------------------------
 //
 // 이것은 단순히 모든 '활성화된 동작들 * 가중치'를 합하고 
@@ -440,6 +790,20 @@ CVector2D CSteeringBehavior::CalculateWeightedSum() {
 	if (On(follow_path))
 	{
 		v_steering_force_ += FollowPath() * weight_follow_path_;
+	}
+
+	if (On(interpose))
+	{
+		assert(p_target_agent1_ && p_target_agent2_ && "Interpose agents not assigned");
+
+		v_steering_force_ += Interpose(p_target_agent1_, p_target_agent2_) * weight_interpose_;
+	}
+
+	if (On(hide))
+	{
+		assert(p_target_agent1_ && "Hide target not assigned");
+
+		v_steering_force_ += Hide(p_target_agent1_, p_vehicle_->GameWorld()->Obstacles()) * weight_hide_;
 	}
 
 	v_steering_force_.Truncate(p_vehicle_->physics_->MaxForce());

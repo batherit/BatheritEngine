@@ -148,6 +148,7 @@
   <ItemGroup>
     <ClInclude Include="C2DMatrix.h" />
     <ClInclude Include="CAudioComponent.h" />
+    <ClInclude Include="CCellSpacePartition.h" />
     <ClInclude Include="CCommonUtil.h" />
     <ClInclude Include="CFMOD.h" />
     <ClInclude Include="CGameCmd.h" />
@@ -200,6 +201,7 @@
   <ItemGroup>
     <ClCompile Include="C2DMatrix.cpp" />
     <ClCompile Include="CAudioComponent.cpp" />
+    <ClCompile Include="CCellSpacePartition.cpp" />
     <ClCompile Include="CCommonUtil.cpp" />
     <ClCompile Include="CFMOD.cpp" />
     <ClCompile Include="CGameCmd.cpp" />

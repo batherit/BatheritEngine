@@ -41,10 +41,12 @@ public:
 	void ObstacleAvoidanceOn() { behavior_flags_ |= obstacle_avoidance; }
 	void WallAvoidanceOn() { behavior_flags_ |= wall_avoidance; }
 	void FollowPathOn() { behavior_flags_ |= follow_path; }
-	/*void InterposeOn(Vehicle* v1, Vehicle* v2) { m_iFlags |= interpose; m_pTargetAgent1 = v1; m_pTargetAgent2 = v2; }
-	void HideOn(Vehicle* v) { m_iFlags |= hide; m_pTargetAgent1 = v; }
-	void OffsetPursuitOn(Vehicle* v1, const Vector2D offset) { m_iFlags |= offset_pursuit; m_vOffset = offset; m_pTargetAgent1 = v1; }
-	void FlockingOn() { CohesionOn(); AlignmentOn(); SeparationOn(); WanderOn(); }*/
+	void InterposeOn(CVehicle* v1, CVehicle* v2) { behavior_flags_ |= interpose; p_target_agent1_ = v1; p_target_agent2_ = v2; }
+	void HideOn(CVehicle* v) { behavior_flags_ |= hide; p_target_agent1_ = v; }
+	void CohesionOn() { behavior_flags_ |= cohesion; }
+	void SeparationOn() { behavior_flags_ |= separation; }
+	void AlignmentOn() { behavior_flags_ |= allignment; }
+	void FlockingOn() { CohesionOn(); AlignmentOn(); SeparationOn(); WanderOn(); }
 
 	// ~Off : 해당 행동을 비활성화시킨다.
 	void SeekOff() { if (On(seek)) behavior_flags_ ^= seek; }
@@ -57,10 +59,12 @@ public:
 	void ObstacleAvoidanceOff() { if (On(obstacle_avoidance)) behavior_flags_ ^= obstacle_avoidance; }
 	void WallAvoidanceOff() { if (On(wall_avoidance)) behavior_flags_ ^= wall_avoidance; }
 	void FollowPathOff() { if (On(follow_path)) behavior_flags_ ^= follow_path; }
-	/*void InterposeOff() { if (On(interpose)) m_iFlags ^= interpose; }
-	void HideOff() { if (On(hide)) m_iFlags ^= hide; }
-	void OffsetPursuitOff() { if (On(offset_pursuit)) m_iFlags ^= offset_pursuit; }
-	void FlockingOff() { CohesionOff(); AlignmentOff(); SeparationOff(); WanderOff(); }*/
+	void InterposeOff() { if (On(interpose)) behavior_flags_ ^= interpose; }
+	void HideOff() { if (On(hide))  behavior_flags_ ^= hide; }
+	void CohesionOff() { if (On(cohesion)) behavior_flags_ ^= cohesion; }
+	void SeparationOff() { if (On(separation)) behavior_flags_ ^= separation; }
+	void AlignmentOff() { if (On(allignment)) behavior_flags_ ^= allignment; }
+	void FlockingOff() { CohesionOff(); AlignmentOff(); SeparationOff(); WanderOff(); }
 
 private:
 	enum BEHAVIOR_TYPE
@@ -124,6 +128,8 @@ private:
 	float weight_obstacle_avoidance_;
 	float weight_wall_avoidance_;
 	float weight_follow_path_;
+	float weight_interpose_;
+	float weight_hide_;
 
 	// 에이전트가 다른 에이전트를 인지할 수 있는 최대 거리
 	float view_distance_;
@@ -153,42 +159,76 @@ private:
 	// 주변의 장애물을 피하는 행동에 사용되는 '더듬이'를 생성한다.
 	void CreateFeelers();
 
-	//this behavior moves the agent towards a target position
+	// 해당 행동은 에이전트를 타겟 위치로 움직이도록 한다.
 	CVector2D Seek(CVector2D TargetPos);
 
-	//this behavior returns a vector that moves the agent away
-	//from a target position
+	// 해당 행동은 타겟 위치로부터 에이전트를 떨어지도록 하는 벡터를 반환한다.
 	CVector2D Flee(CVector2D TargetPos);
 
-	//this behavior is similar to seek but it attempts to arrive 
-	//at the target position with a zero velocity
+	// 해당 해동은 'Seek'와 유사하나, 제로 속도로 타겟 위치에 도착하려고 시도한다. 
 	CVector2D Arrive(CVector2D     TargetPos, Deceleration deceleration);
 
-	//this behavior predicts where an agent will be in time T and seeks
-	//towards that point to intercept it.
+	// 해당 행동은 어디에 에이전트가 시간 T에 있을 것인지 예측하고 에이전트를
+	// 가로챌 지점을 향하도록 한다.
 	CVector2D Pursuit(const CVehicle* agent);
 
-	//this behavior attempts to evade a pursuer
+	// 이 행동은 타겟 비히클에서 오프셋의 방향으로 위치를
+	// 유지하도록 한다.
+	CVector2D OffsetPursuit(const CVehicle* agent, const CVector2D offset);
+
+	// 이 행동은 추적자를 피하도록 한다.
 	CVector2D Evade(const CVehicle* agent);
 
-	//this behavior makes the agent wander about randomly
+	// 이 행동은 에이전트가 무작위로 배회하도록 한다.
 	CVector2D Wander();
 
 	// 이것은 에이전트가 직면하는 몇몇 장애물들과 멀어지도록하는 조종력을
 	// 반환하도록 한다.
 	CVector2D ObstacleAvoidance(const std::vector<CGameObject*>& obstacles);
 
-	//this returns a steering force which will keep the agent away from any
-	//walls it may encounter
+	// 이것은 에이전트가 마주치는 벽을 피하도록 하는 조종힘을 반환한다.
 	CVector2D WallAvoidance(const std::vector<CWall2D> &walls);
 
 	//일련의 Vector2D가 주어지면, 이 메서드는 
 	//에이전트를 중간 지점을 따라 순서대로 이동시키는 힘을 생성한다.
 	CVector2D FollowPath();
 
+	// 이것은 움직이는 두 에이전트를 연결하는 벡터의 중앙으로
+	// 비히클을 조종하려는 힘을 반환한다.
+	CVector2D Interpose(const CVehicle* VehicleA, const CVehicle* VehicleB);
+
+	// 숨기위해 고려되는 다른 에이전트 위치와 게임 오브젝트 리스트가 주어진다면,
+	// 이 메서드는 자신과 상대 사이에 장애물을 두려는 시도를 한다.
+	CVector2D Hide(const CVehicle* hunter, const std::vector<CGameObject*>& obstacles);
+
+	// -- 그룹 행동들 -- //
+
+	// 응집
+	CVector2D Cohesion(const std::vector<CVehicle*> &agents);
+
+	// 분리
+	CVector2D Separation(const std::vector<CVehicle*> &agents);
+
+	// 정렬
+	CVector2D Alignment(const std::vector<CVehicle*> &agents);
+
+	// 다음 세 개의 메서드는 위의 것과 동일하지만 이웃 에이전트를 찾기 위해
+	// 셀 공간 분할을 사용한다는 점이 다르다.
+	//the following three are the same as above but they use cell-space
+	//partitioning to find the neighbors
+	CVector2D CohesionPlus(const std::vector<CVehicle*> &agents);
+	CVector2D SeparationPlus(const std::vector<CVehicle*> &agents);
+	CVector2D AlignmentPlus(const std::vector<CVehicle*> &agents);
+
 	// 활성화된 몇가지 행동들에서 조종힘을 계산하고 더한다.
 	CVector2D CalculateWeightedSum();
 	CVector2D CalcuclatePrioritized();
 	CVector2D CalculateDithered();
+
+	// 숨기 행동에 대한 도움자 메서드이다. 추적자에 반대편 장애물에 위치를
+	// 반환한다.
+	CVector2D GetHidingPosition(const CVector2D& posOb,
+		const float     radiusOb,
+		const CVector2D& posHunter);
 };
 
