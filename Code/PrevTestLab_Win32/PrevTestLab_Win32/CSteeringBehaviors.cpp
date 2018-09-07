@@ -1,8 +1,9 @@
 #include<algorithm>
 #include "CSteeringBehaviors.h"
 #include "CObjectFuncTemplates.h"
-#include"CUtil.h"
+#include "CUtil.h"
 #include "CGameTimer.h"
+#include "CGameWorld.h"
 #include "CGameObject.h"
 #include "CVehicle.h"
 using namespace std;

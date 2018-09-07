@@ -1,5 +1,6 @@
 #include "CVehicle.h"
 #include "CMathUtil.h"
+#include "CGameWorld.h"
 #include "CSteeringBehaviors.h"
 
 CVehicle::~CVehicle()

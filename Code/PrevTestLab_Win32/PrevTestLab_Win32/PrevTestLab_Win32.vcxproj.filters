@@ -141,6 +141,9 @@
     <ClInclude Include="CCellSpacePartition.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="CInvertedAABBox2D.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -264,6 +267,9 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="CCellSpacePartition.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="CInvertedAABBox2D.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

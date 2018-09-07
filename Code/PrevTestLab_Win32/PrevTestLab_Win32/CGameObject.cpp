@@ -1,5 +1,6 @@
 #include<cassert>
 #include "CGameObject.h"
+#include "CGameWorld.h"
 #include "CGameComponent.h"
 #include "CRenderComponent.h"
 

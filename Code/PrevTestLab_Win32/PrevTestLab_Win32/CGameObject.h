@@ -1,12 +1,12 @@
 #pragma once
 #include<cstring>
-#include"CGameTelegram.h"
-#include"CGameObjectManager.h"
-#include"CTransformComponent.h"
-#include"CGameMesh.h"
-#include"CGameWorld.h"
+#include "CGameTelegram.h"
+#include "CGameObjectManager.h"
+#include "CTransformComponent.h"
+#include "CGameMesh.h"
 #include "CPhysicsComponent.h"
 
+class CGameWorld;
 class CGameComponent;
 class CRenderComponent;
 

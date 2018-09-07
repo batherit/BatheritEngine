@@ -165,6 +165,7 @@
     <ClInclude Include="CGameWorld.h" />
     <ClInclude Include="CGeometryGenerator.h" />
     <ClInclude Include="CIniFileLoaderBase.h" />
+    <ClInclude Include="CInvertedAABBox2D.h" />
     <ClInclude Include="CMathUtil.h" />
     <ClInclude Include="CObjectFuncTemplates.h" />
     <ClInclude Include="CPath2D.h" />
@@ -218,6 +219,7 @@
     <ClCompile Include="CGameWorld.cpp" />
     <ClCompile Include="CGeometryGenerator.cpp" />
     <ClCompile Include="CIniFileLoaderBase.cpp" />
+    <ClCompile Include="CInvertedAABBox2D.cpp" />
     <ClCompile Include="CMathUtil.cpp" />
     <ClCompile Include="CObjectFuncTemplates.cpp" />
     <ClCompile Include="CPath2D.cpp" />

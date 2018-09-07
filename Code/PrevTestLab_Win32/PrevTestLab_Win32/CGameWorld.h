@@ -1,8 +1,10 @@
 #pragma once
 #include<vector>
-#include"CWall2D.h"
 #include"CVector2D.h"
+#include"CWall2D.h"
+#include"CCellSpacePartition.h"
 #include"CObjectFuncTemplates.h"
+#include"CVehicle.h"
 
 class CGameObject;
 class Obstacle;
@@ -38,6 +40,7 @@ public:
 	}
 
 	const std::vector<CWall2D>&			Walls() { return walls_; }
+	CCellSpacePartition<CVehicle*>*		CellSpace() { return cell_space_; }
 	const std::vector<CGameObject*>&	Obstacles()const { return obstacles_; }
 	const std::vector<CGameObject*>&	Agents() { return agents_; }
 
@@ -56,6 +59,7 @@ private:
 	std::vector<CGameObject*>	agents_;
 	std::vector<CGameObject*>	obstacles_;
 	std::vector<CWall2D>		walls_;
+	CCellSpacePartition<CVehicle*>* cell_space_;
 
 	Path*						p_path_;
 	bool						b_paused_;
