@@ -52,17 +52,17 @@ CVector2D CSteeringBehavior::Calculate() {
 }
 
 void CSteeringBehavior::CreateFeelers() {
-	//feeler pointing straight in front
+	// 앞쪽 감지기
 	feelers_[0] = p_vehicle_->transform_.pos_ + wall_detection_feeler_length_ * p_vehicle_->transform_.look_;
 
-	//feeler to left
+	// 왼쪽 감지기
 	CVector2D temp = p_vehicle_->transform_.look_;
-	Vec2DRotateAroundOrigin(temp, HalfPi * 3.5f);
+	Vec2DRotateAroundOrigin(temp, HalfPi * 3.5f);	// y축이 반전된 상태란 것을 고려
 	feelers_[1] = p_vehicle_->transform_.pos_ + wall_detection_feeler_length_ / 2.0f * temp;
 
-	//feeler to right
+	// 오른쪽 감지기
 	temp = p_vehicle_->transform_.look_;
-	Vec2DRotateAroundOrigin(temp, HalfPi * 0.5f);
+	Vec2DRotateAroundOrigin(temp, HalfPi * 0.5f);	// y축이 반전된 상태란 것을 고려
 	feelers_[2] = p_vehicle_->transform_.pos_ + wall_detection_feeler_length_ / 2.0f * temp;
 }
 
@@ -303,12 +303,13 @@ CVector2D CSteeringBehavior::CohesionPlus(const vector<CVehicle*> &neighbors)
 	return Vec2DNormalize(steering_force);
 }
 
-//this behavior returns a vector that moves the agent away
-//from a target position
+// 해당 해동은 타겟 위치로부터 에이전트를 떨어뜨리는 
+// 벡터를 반환한다.
 CVector2D CSteeringBehavior::Flee(CVector2D target_pos) {
 	
 	// 패닉 상태(제곱 거리 판별)에 있을 때에만 '달아나기(Flee)'가 유효하도록 한다.
-	const double panic_distance_sq = 100.0f * 100.0f;
+	// 타겟과의 거리가 100 이하가 아닐 경우 Flee를 작동시키지 않는다.
+	const float panic_distance_sq = 100.0f * 100.0f;		
 	if (Vec2DDistanceSq(p_vehicle_->transform_.pos_, target_pos) > panic_distance_sq) {
 		return CVector2D(0,0);
 	}
@@ -342,12 +343,25 @@ CVector2D CSteeringBehavior::Arrive(CVector2D     TargetPos, Deceleration decele
 		// 여기서부터는 이미 to_target 벡터의 길이, dist를 계산했으므로
 		// 이 벡터를 정규화할 필요가 없다는 것을 제외하고는
 		// 찾기와 같은 방법으로 진행한다.
+		// (to_target / dist => 정규화된 to_target)
 		CVector2D desired_velocity = to_target * speed / dist;
 
 		return (desired_velocity - p_vehicle_->physics_->Velocity());
 	}
 
 	return CVector2D(0, 0);
+}
+
+// [0~1]값을 반환 : 대면 - 0, 반대 - 1
+float CSteeringBehavior::TurnAroundTime(const CVehicle* agent, CVector2D target_pos) const {
+	// 목표까지의 정규화된 벡터를 결정한다.
+	CVector2D to_target = Vec2DNormalize(target_pos - agent->transform_.pos_);
+
+	float dot = agent->transform_.look_.Dot(to_target);
+
+	const float coefficient = 0.5f;
+
+	return (dot - 1.0f) * -coefficient;
 }
 
 // '추격하기(Pursuit)'은 에이전트의 미래 위치를 예측하여 그 지점으로 이동한다.
@@ -359,8 +373,8 @@ CVector2D CSteeringBehavior::Pursuit(const CVehicle* evader) {
 
 	float relative_look = p_vehicle_->transform_.look_.Dot(evader->transform_.look_);
 
-	if ((to_evader.Dot(p_vehicle_->transform_.look_) > 0) &&
-		(relative_look < -0.95))  //acos(0.95)=18 degs
+	if ((to_evader.Dot(p_vehicle_->transform_.look_) > 0.0f) &&
+		(relative_look < -0.95f))  //acos(0.95)=18 degs
 	{
 		return Seek(evader->transform_.pos_);
 	}
@@ -372,6 +386,7 @@ CVector2D CSteeringBehavior::Pursuit(const CVehicle* evader) {
 	float look_ahead_time = to_evader.Length() /
 		(p_vehicle_->physics_->MaxSpeed() + evader->physics_->Speed());
 
+	look_ahead_time += TurnAroundTime(p_vehicle_, evader->transform_.pos_);
 	// 이제 도피자가 있을 것으로 예측된 미래 위치로 찾아간다.
 	return Seek(evader->transform_.pos_ + evader->physics_->Velocity() * look_ahead_time);
 }
@@ -379,7 +394,7 @@ CVector2D CSteeringBehavior::Pursuit(const CVehicle* evader) {
 //------------------------- Offset Pursuit -------------------------------
 //
 //  리더 비히클로부터 특정된 오프셋으로 비히클을 두려는 조종힘을 
-//  만들어낸다.
+//  만들어낸다. 오프셋은 선도자의 로컬 공간에 정의된다.
 //------------------------------------------------------------------------
 CVector2D CSteeringBehavior::OffsetPursuit(const CVehicle* leader, const CVector2D offset) {
 	// 월드 공간에서의 오프셋 위치를 구한다.
@@ -399,32 +414,32 @@ CVector2D CSteeringBehavior::OffsetPursuit(const CVehicle* leader, const CVector
 	return Arrive(world_offset_pos + leader->physics_->Velocity() * lookahead_time, fast);
 }
 
-//this behavior attempts to evade a pursuer
+// 예측된 위치로부터 회피하는 조종힘을 반환한다.
 CVector2D CSteeringBehavior::Evade(const CVehicle* pursuer) {
-	/* Not necessary to include the check for facing direction this time */
+	/* 이번에 직면하는지를 체크하는 코드를 포함하는 것은 불필요하다. */
 
-	CVector2D ToPursuer = pursuer->transform_.pos_ - p_vehicle_->transform_.pos_;
+	CVector2D to_pursuer = pursuer->transform_.pos_ - p_vehicle_->transform_.pos_;
 
-	//uncomment the following two lines to have Evade only consider pursuers 
-	//within a 'threat range'
-	const float ThreatRange = 100.0;
-	if (ToPursuer.LengthSq() > ThreatRange * ThreatRange) return CVector2D();
+	// 단지 위협 거리 안에서만 해당 함수를 동작하게 하려면
+	// 다음의 두 라인을 추가한다.
+	const float threat_range = 100.0f;
+	if (to_pursuer.LengthSq() > threat_range * threat_range) return CVector2D();
 
 	//the lookahead time is propotional to the distance between the pursuer
 	//and the pursuer; and is inversely proportional to the sum of the
 	//agents' velocities
-	float LookAheadTime = ToPursuer.Length() /
+	float LookAheadTime = to_pursuer.Length() /
 		(p_vehicle_->physics_->MaxSpeed() + pursuer->physics_->Speed());
 
 	//now flee away from predicted future position of the pursuer
 	return Flee(pursuer->transform_.pos_ + pursuer->physics_->Velocity() * LookAheadTime);
 }
 
-//this behavior makes the agent wander about randomly
+// 해당 행동은 에이전트가 무작위로 배회하도록 한다.
 CVector2D CSteeringBehavior::Wander() {
-	/*this behavior is dependent on the update rate, so this line must
-	be included when using time independent framerate.*/
-	float jitter_this_time_slice = wander_jitter_ * WorldTimer->GetElapsedTimePerFrame();  /*wander_jitter_ * WorldTimer*/
+	/*해당 행동은 갱신율에 의존하기에, 아래의 라인은 시간 독립적인 프레임율을 사용할 때
+	포함된다.*/
+	float jitter_this_time_slice = wander_jitter_ * WorldTimer->GetElapsedTimePerFrame();
 
 	// 우선 소량의 무작위 벡터를 목표물의 위치에 더한다. (RandomClamped는
 	// -1과 1 사이의 값을 반환한다.
@@ -451,12 +466,14 @@ CVector2D CSteeringBehavior::Wander() {
 }
 
 CVector2D CSteeringBehavior::ObstacleAvoidance(const std::vector<CGameObject*>& obstacles) {
-	// 감지 상자의 길이는 에이전트의 속도에 비례한다.
+	// 감지 상자의 길이는 에이전트의 속도에 비례한다. (최대 min_detecction_box_length의 2배 길이)
 	detection_box_length_ = VehiclePrm.min_detection_box_length_ +
 		(p_vehicle_->physics_->Speed() / p_vehicle_->physics_->MaxSpeed()) *
 		VehiclePrm.min_detection_box_length_;
 
 	// 감지 상자 범위 내의 장애물들을 처리하기 위해 표시해둔다.
+	// 감지 박스의 길이를 반지름으로 하는 원 내부에 장애물이 들어올 경우,
+	// 그 장애물의 태그를 건다.
 	p_vehicle_->GameWorld()->TagObstaclesWithinViewRange(p_vehicle_, detection_box_length_);
 
 	// 이 부분은 교차하고 있는 가장 근접한 장애물(CIB)들을 추적한다.
@@ -483,17 +500,17 @@ CVector2D CSteeringBehavior::ObstacleAvoidance(const std::vector<CGameObject*>& 
 			// 로컬 위치가 음수 x 값이면 에이전트 뒤에 있어야 한다. (이 경우 무시할 수 있음)
 			if (local_pos.x_ >= 0)
 			{
-
 				// x 축에서 객체의 위치까지의 거리가 반경 + 감지 상자의 너비의 절반보다 작으면 
 				// 잠재적인 교차점이라 할 수 있다.
 				float expanded_radius =
 					(*curOb)->Mesh()->GetBoundingRad() +
-					p_vehicle_->Mesh()->GetBoundingRad();
+					p_vehicle_->Mesh()->GetBoundingRad();	// 비히클의 경계 반경
 
 				if (fabs(local_pos.y_) < expanded_radius)
 				{
 					// 이제 선 / 원 교차 테스트를 수행한다. 원의 중심은(cX, cY)로 표시된다.
-					// 교점은 y = 0에 대한 공식 x = cX + / -sqrt(r ^ 2 - cY ^ 2)로 표시된다.
+					// 교점은 y = 0에 대한 공식 x = cX +/-sqrt(r ^ 2 - cY ^ 2)로 표시된다.
+					// (원의 방정식을 참고.)
 					// x의 가장 작은 양의 값은 가장 가까운 교차점이 될 것이다.
 					float cX = local_pos.x_;
 					float cY = local_pos.y_;
@@ -552,13 +569,13 @@ CVector2D CSteeringBehavior::ObstacleAvoidance(const std::vector<CGameObject*>& 
 }
 
 CVector2D CSteeringBehavior::WallAvoidance(const std::vector<CWall2D> &walls) {
-	//the feelers are contained in a std::vector, m_Feelers
+	// feelers_ 벡터에 감지기 정보가 들어간다.
 	CreateFeelers();
 
 	float dist_to_this_IP = 0.0f;
 	float dist_to_closest_IP = MaxFloat;
 
-	//this will hold an index into the vector of walls
+	// 이것은 벽 벡터에 대한 한 인덱스를 저장할 것이다.
 	int closest_wall = -1;
 
 	CVector2D steering_force,
@@ -642,7 +659,7 @@ CVector2D CSteeringBehavior::FollowPath()
 //  위치시키려는 힘을 반환한다.
 //------------------------------------------------------------------------
 CVector2D CSteeringBehavior::Interpose(const CVehicle* vehicleA, const CVehicle* vehicleB) {
-	// 첫째로, 우리는 두 에이전트가 미래의 시간 T에 대하여 어디로 갈지에 대해 파악할 
+	// 첫째로, 우리는 두 에이전트가 미래의 시간 T에 대하여 어디에 있을지에 대해 파악할 
 	// 필요가 있다. 이것은 최대 속도에서 현재 시간에 대하여 중앙 지점으로 도달하기까지
 	// 걸리는 시간을 결정함으로써 근사할 수 있다.
 	CVector2D mid_point = (vehicleA->transform_.pos_ + vehicleB->transform_.pos_) / 2.0f;
@@ -664,6 +681,8 @@ CVector2D CSteeringBehavior::Interpose(const CVehicle* vehicleA, const CVehicle*
 
 //--------------------------- Hide ---------------------------------------
 //
+//	이 행동은 에이전트와 추적자 사이에 항상 장애물이 놓이도록 하는
+//	조종힘을 반환한다.
 //------------------------------------------------------------------------
 CVector2D CSteeringBehavior::Hide(const CVehicle* hunter,
 	const vector<CGameObject*>& obstacles)
@@ -699,7 +718,6 @@ CVector2D CSteeringBehavior::Hide(const CVehicle* hunter,
 	}// while문 끝
 
 	// 적절한 장애물들을 찾지 못했다면, 헌터를 피하도록 한다.
-	 //if no suitable obstacles found then Evade the hunter
 	if (dist_to_closest == MaxFloat)
 	{
 		return Evade(hunter);

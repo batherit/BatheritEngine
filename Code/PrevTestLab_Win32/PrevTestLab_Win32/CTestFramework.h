@@ -51,7 +51,7 @@ inline void CTestFramework::Init(int cx, int cy) {
 
 	CGameMesh* p_mesh = new CGameMesh();
 	p_mesh->SetMeshVB(VehicleVB());
-	p_mesh->SetBoundingRad(10.0f);
+	p_mesh->SetBoundingRad(12.0f);
 	p_test_object_->SetMesh(p_mesh);
 	p_test_object_->RegisterRenderComponent(new CWIn32RenderComponent());
 

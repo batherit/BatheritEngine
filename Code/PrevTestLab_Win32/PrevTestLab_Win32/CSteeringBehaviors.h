@@ -88,6 +88,8 @@ private:
 		offset_pursuit = 0x10000,
 	};
 
+	float TurnAroundTime(const CVehicle* pAgent, CVector2D TargetPos) const;
+
 	// 조종 행동이 조종하는 비하이클
 	CVehicle* p_vehicle_;
 	CVector2D v_steering_force_;
@@ -214,8 +216,6 @@ private:
 
 	// 다음 세 개의 메서드는 위의 것과 동일하지만 이웃 에이전트를 찾기 위해
 	// 셀 공간 분할을 사용한다는 점이 다르다.
-	//the following three are the same as above but they use cell-space
-	//partitioning to find the neighbors
 	CVector2D CohesionPlus(const std::vector<CVehicle*> &agents);
 	CVector2D SeparationPlus(const std::vector<CVehicle*> &agents);
 	CVector2D AlignmentPlus(const std::vector<CVehicle*> &agents);
@@ -231,4 +231,3 @@ private:
 		const float     radiusOb,
 		const CVector2D& posHunter);
 };
-
