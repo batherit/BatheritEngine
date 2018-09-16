@@ -171,6 +171,7 @@
     <ClInclude Include="CPath2D.h" />
     <ClInclude Include="CPhysicsComponent.h" />
     <ClInclude Include="CRenderComponent.h" />
+    <ClInclude Include="CSmoother.h" />
     <ClInclude Include="CSteeringBehaviors.h" />
     <ClInclude Include="CTestFramework.h" />
     <ClInclude Include="CTestPerson.h" />
@@ -225,6 +226,7 @@
     <ClCompile Include="CPath2D.cpp" />
     <ClCompile Include="CPhysicsComponent.cpp" />
     <ClCompile Include="CRenderComponent.cpp" />
+    <ClCompile Include="CSmoother.cpp" />
     <ClCompile Include="CSteeringBehaviors.cpp" />
     <ClCompile Include="CTestFramework.cpp" />
     <ClCompile Include="CTestPerson.cpp" />

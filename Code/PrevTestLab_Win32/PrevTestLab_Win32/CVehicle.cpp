@@ -3,10 +3,6 @@
 #include "CGameWorld.h"
 #include "CSteeringBehaviors.h"
 
-CVehicle::~CVehicle()
-{
-}
-
 void CVehicle::Update(float time_elapsed) {
 	CVector2D old_pos = transform_.pos_;				// 이전 위치 좌표
 	CVector2D steering_force = p_steering_->Calculate();		// 조종 행동 힘 계산
@@ -26,8 +22,20 @@ void CVehicle::Update(float time_elapsed) {
 
 	physics_->SetVelocity(velocity);
 
-	//treat the screen as a toroid
+	// 도넛형으로 스크린을 다룬다.
 	WrapAround(transform_.pos_, GameWorld()->Width(), GameWorld()->Height());
+
+	// 공간 분할이 켜져있다면, 비히클의 최근 셀을 업데이트한다.
+	//update the vehicle's current cell if space partitioning is turned on
+	if (Steering()->IsSpacePartitioningOn())
+	{
+		GameWorld()->CellSpace()->UpdateEntity(this, old_pos);
+	}
+
+	if (IsSmoothingOn())
+	{
+		smoothed_heading_ = heading_smoother_->Update(transform_.look_);
+	}
 
 	CGameObject::Update(time_elapsed);
 }

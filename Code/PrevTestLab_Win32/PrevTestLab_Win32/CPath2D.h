@@ -19,7 +19,6 @@ public:
 		CreateRandomPath(num_waypoints, min_X, min_Y, max_X, max_Y);
 		cur_waypoint_ = waypoints_.begin();
 	}
-	~CPath2D();
 
 	CVector2D CurrentWaypoint()const { return *cur_waypoint_; }
 

@@ -26,9 +26,12 @@ public:
 	enum SUMMING_METHOD { WEIGHTED_AVERAGE, PRIORITIZED, DITHERED };
 
 	CSteeringBehavior(CVehicle* agent);
-	~CSteeringBehavior();
+	virtual ~CSteeringBehavior();
 
 	CVector2D Calculate();
+
+	void ToggleSpacePartitioningOnOff() { is_cell_space_on_ = !is_cell_space_on_; }
+	bool IsSpacePartitioningOn()const { return is_cell_space_on_; }
 
 	// ~On : 해당 행동을 활성화시킨다.
 	void SeekOn() { behavior_flags_ |= seek; }
@@ -120,6 +123,9 @@ private:
 	float wander_distance_;
 
 	// 곱셈자. 행동에 자연스러움을 위해 사용된다.
+	float weight_separation_;
+	float weight_cohesion_;
+	float weight_alignment_;
 	float weight_seek_;
 	float weight_flee_;
 	float weight_arrive_;
@@ -152,6 +158,11 @@ private:
 
 	//default
 	Deceleration deceleration_;
+
+	// 셀 공간 분할이 사용되는지?
+	bool is_cell_space_on_;
+
+	SUMMING_METHOD summing_method_;
 
 	// 해당 이진 플래그가 유효(행동이 활성화되었는지)한지 검사한다.
 	bool On(BEHAVIOR_TYPE bt) { return (behavior_flags_ & bt) == bt; }
@@ -206,23 +217,23 @@ private:
 	// -- 그룹 행동들 -- //
 
 	// 응집
-	CVector2D Cohesion(const std::vector<CVehicle*> &agents);
+	CVector2D Cohesion(const std::vector<CGameObject*> &agents);
 
 	// 분리
-	CVector2D Separation(const std::vector<CVehicle*> &agents);
+	CVector2D Separation(const std::vector<CGameObject*> &agents);
 
 	// 정렬
-	CVector2D Alignment(const std::vector<CVehicle*> &agents);
+	CVector2D Alignment(const std::vector<CGameObject*> &agents);
 
 	// 다음 세 개의 메서드는 위의 것과 동일하지만 이웃 에이전트를 찾기 위해
 	// 셀 공간 분할을 사용한다는 점이 다르다.
-	CVector2D CohesionPlus(const std::vector<CVehicle*> &agents);
-	CVector2D SeparationPlus(const std::vector<CVehicle*> &agents);
-	CVector2D AlignmentPlus(const std::vector<CVehicle*> &agents);
+	CVector2D CohesionPlus(const std::vector<CGameObject*> &agents);
+	CVector2D SeparationPlus(const std::vector<CGameObject*> &agents);
+	CVector2D AlignmentPlus(const std::vector<CGameObject*> &agents);
 
 	// 활성화된 몇가지 행동들에서 조종힘을 계산하고 더한다.
 	CVector2D CalculateWeightedSum();
-	CVector2D CalcuclatePrioritized();
+	CVector2D CalculatePrioritized();
 	CVector2D CalculateDithered();
 
 	// 숨기 행동에 대한 도움자 메서드이다. 추적자에 반대편 장애물에 위치를

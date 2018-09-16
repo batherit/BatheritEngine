@@ -1,4 +1,5 @@
 #include<algorithm>
+#include<vector>
 #include "CSteeringBehaviors.h"
 #include "CObjectFuncTemplates.h"
 #include "CUtil.h"
@@ -11,6 +12,9 @@ using namespace std;
 CSteeringBehavior::CSteeringBehavior(CVehicle* agent) :
 	p_vehicle_(agent),
 	behavior_flags_(0),
+	weight_separation_(VehiclePrm.separation_weight_),
+	weight_cohesion_(VehiclePrm.cohesion_weight_),
+	weight_alignment_(VehiclePrm.alignment_weight_),
 	weight_seek_(VehiclePrm.seek_weight_),
 	weight_flee_(VehiclePrm.flee_weight_),
 	weight_arrive_(VehiclePrm.arrive_weight_),
@@ -32,7 +36,9 @@ CSteeringBehavior::CSteeringBehavior(CVehicle* agent) :
 	wander_radius_(WANDER_RAD),
 	waypoint_seek_dist_sq_(WAY_POINT_SEEK_DIST * WAY_POINT_SEEK_DIST),
 	p_target_agent1_(nullptr),
-	p_target_agent2_(nullptr)
+	p_target_agent2_(nullptr),
+	is_cell_space_on_(false),
+	summing_method_(PRIORITIZED)
 {
 	float theta = RandFloat() * TwoPi;
 	wander_target_ = CVector2D(wander_radius_ * cos(theta), wander_radius_ * sin(theta));
@@ -41,14 +47,83 @@ CSteeringBehavior::CSteeringBehavior(CVehicle* agent) :
 	p_path_->LoopOn();
 }
 
+CSteeringBehavior::~CSteeringBehavior() { delete p_path_; }
+
 CVector2D CSteeringBehavior::Calculate() {
+	// 조종력을 0벡터로 세팅한다.
 	v_steering_force_.Zero();
 
-	// TODO : 공간 분할 설정
-	// TODO : 조종 행동 유형 변경
-	v_steering_force_ = CalculateWeightedSum();
+	// 공간 분할이 켜졌다면, 해당 비히클의 이웃을 계산하게 된다.
+	// 그렇지 않다면 표준적인 태깅 시스템을 사용한다.
+	if (!IsSpacePartitioningOn())
+	{
+		// 다음의 세 행동 중 하나라도 켜져있다면 이웃을 태그한다.
+		if (On(separation) || On(allignment) || On(cohesion))
+		{
+			p_vehicle_->GameWorld()->TagAgentsWithinViewRange(p_vehicle_, view_distance_);
+		}
+	}
+	else
+	{
+		// 다음 세 그룹 행동 중 하나라도 켜져있다면, 셀 공간에서 이웃들을 계산한다.
+		if (On(separation) || On(allignment) || On(cohesion))
+		{
+			p_vehicle_->GameWorld()->CellSpace()->CalculateNeighbors(p_vehicle_->transform_.pos_, view_distance_);
+		}
+	}
+
+	switch (summing_method_) {
+	case WEIGHTED_AVERAGE:
+		v_steering_force_ = CalculateWeightedSum();
+		break;
+	case PRIORITIZED:
+		v_steering_force_ = CalculatePrioritized();
+		break;
+	case DITHERED:
+		v_steering_force_ = CalculateDithered();
+		break;
+	default:
+		v_steering_force_ = CVector2D(0.0f, 0.0f);
+	} // 스위치문 끝
 
 	return v_steering_force_;
+}
+
+//--------------------- AccumulateForce ----------------------------------
+//
+//	이 함수는 얼마나 많은 최대 조종력을 비히클이 적용하기 위해
+//	남길 것인지를 계산한다. 그리고 이것은 더해질 힘의 양을 적용한다.
+//------------------------------------------------------------------------
+bool CSteeringBehavior::AccumulateForce(CVector2D &RunningTot,
+	CVector2D ForceToAdd)
+{
+	// 얼마나 많은 조종력을 비히클이 '지금까지' 사용해왔는지를 계산한다.
+	float magnitude_sofar = RunningTot.Length();
+
+	// 얼마나 많은 조종력을 비히클이 사용할 것인지를 계산한다.
+	float magnitude_remaining = p_vehicle_->physics_->MaxForce() - magnitude_sofar;
+
+	// 사용될 남은 힘이 더 이상 없다면 false를 반환한다.
+	if (magnitude_remaining <= 0.0f) return false;
+
+	// 추가되길 원하는 힘의 양을 계산한다.
+	float magnitude_to_add = ForceToAdd.Length();
+
+	// ForceToAdd와 계산된 합의 양이 해당 비히클이 이용할 수 있는 최대 힘을
+	// 초과하지 않는다면 합산하여 저장한다. 그렇지 않다면 ForceToAdd 벡터를
+	// 최대 힘을 넘지 않는 선에서 가능한 더한다.
+	if (magnitude_to_add < magnitude_remaining)
+	{
+		RunningTot += ForceToAdd;
+	}
+
+	else
+	{
+		// 이것을 조종력에 더한다.
+		RunningTot += (Vec2DNormalize(ForceToAdd) * magnitude_remaining);
+	}
+
+	return true;
 }
 
 void CSteeringBehavior::CreateFeelers() {
@@ -78,7 +153,7 @@ CVector2D CSteeringBehavior::Seek(CVector2D target_pos) {
 //
 // 이것은 다른 이웃들로부터 반발하는 힘들 계산한다.
 //------------------------------------------------------------------------
-CVector2D CSteeringBehavior::Separation(const vector<CVehicle*> &neighbors)
+CVector2D CSteeringBehavior::Separation(const vector<CGameObject*> &neighbors)
 {
 	CVector2D steering_force;
 
@@ -105,7 +180,7 @@ CVector2D CSteeringBehavior::Separation(const vector<CVehicle*> &neighbors)
 //  이웃들에 향하는 에이전트들을 정렬하도록하는 
 //  힘을 반환한다.
 //------------------------------------------------------------------------
-CVector2D CSteeringBehavior::Alignment(const vector<CVehicle*>& neighbors)
+CVector2D CSteeringBehavior::Alignment(const vector<CGameObject*>& neighbors)
 {
 	// 이웃들의 평균 헤딩 벡터를 기록하는데 사용된다.
 	CVector2D average_heading;
@@ -146,7 +221,7 @@ CVector2D CSteeringBehavior::Alignment(const vector<CVehicle*>& neighbors)
 //  즉각 지역에서 '군중의 중심'을 향하도록 에이전트를 움직이도록하는
 //  조종힘을 반환한다.
 //------------------------------------------------------------------------
-CVector2D CSteeringBehavior::Cohesion(const vector<CVehicle*> &neighbors)
+CVector2D CSteeringBehavior::Cohesion(const vector<CGameObject*> &neighbors)
 {
 	// 첫째로 군중의 중심을 찾는다.
 	CVector2D center_of_mass, steering_force;
@@ -192,7 +267,7 @@ CVector2D CSteeringBehavior::Cohesion(const vector<CVehicle*> &neighbors)
 //
 //  공간 분할을 사용한다.
 //------------------------------------------------------------------------
-CVector2D CSteeringBehavior::SeparationPlus(const vector<CVehicle*> &neighbors)
+CVector2D CSteeringBehavior::SeparationPlus(const vector<CGameObject*> &neighbors)
 {
 	CVector2D steering_force;
 
@@ -222,7 +297,7 @@ CVector2D CSteeringBehavior::SeparationPlus(const vector<CVehicle*> &neighbors)
 //
 //  공간 분할을 사용한다.
 //------------------------------------------------------------------------
-CVector2D CSteeringBehavior::AlignmentPlus(const vector<CVehicle*> &neighbors)
+CVector2D CSteeringBehavior::AlignmentPlus(const vector<CGameObject*> &neighbors)
 {
 	// 이것은 이웃들의 평균 헤딩 벡터를 기록한다.
 	CVector2D average_heading;
@@ -266,7 +341,7 @@ CVector2D CSteeringBehavior::AlignmentPlus(const vector<CVehicle*> &neighbors)
 //
 //  공간 분할을 사용한다.
 //------------------------------------------------------------------------
-CVector2D CSteeringBehavior::CohesionPlus(const vector<CVehicle*> &neighbors)
+CVector2D CSteeringBehavior::CohesionPlus(const vector<CGameObject*> &neighbors)
 {
 	// 첫째로 군중 중심을 찾는다.
 	CVector2D center_of_mass, steering_force;
@@ -750,12 +825,213 @@ CVector2D CSteeringBehavior::GetHidingPosition(const CVector2D& posOb,
 	return (ToOb * dist_away) + posOb;
 }
 
+//---------------------- CalculatePrioritized ----------------------------
+//
+//	해당 메서드는 각 활성화된 행동을 우선순위에 따라 호출하며, 최대힘에
+//	도달하기 전까지 각 행동에 대한 조종힘들을 누적한다. 최대힘까지 누적된
+//	조종력을 반환한다.
+//------------------------------------------------------------------------
+CVector2D CSteeringBehavior::CalculatePrioritized()
+{
+	CVector2D force;
+
+	if (On(wall_avoidance))
+	{
+		force = WallAvoidance(p_vehicle_->GameWorld()->Walls()) * weight_wall_avoidance_;
+
+		if (!AccumulateForce(v_steering_force_, force)) return v_steering_force_;
+	}
+
+	if (On(obstacle_avoidance))
+	{
+		force = ObstacleAvoidance(p_vehicle_->GameWorld()->Obstacles()) * weight_obstacle_avoidance_;
+
+		if (!AccumulateForce(v_steering_force_, force)) return v_steering_force_;
+	}
+
+	if (On(evade))
+	{
+		assert(p_target_agent1_ && "Evade target not assigned");
+
+		force = Evade(p_target_agent1_) * weight_evade_;
+
+		if (!AccumulateForce(v_steering_force_, force)) return v_steering_force_;
+	}
+
+
+	if (On(flee))
+	{
+		force = Flee(p_vehicle_->GameWorld()->PickPoint()) * weight_flee_;
+
+		if (!AccumulateForce(v_steering_force_, force)) return v_steering_force_;
+	}
+
+
+	// 다음의 세 가지는 무리 행동을 위해 결합된다.
+	// (wander는 이 결합에 추가되봄직하다.)
+	if (!IsSpacePartitioningOn())
+	{
+		if (On(separation))
+		{
+			force = Separation(p_vehicle_->GameWorld()->Agents()) * weight_separation_;
+
+			if (!AccumulateForce(v_steering_force_, force)) return v_steering_force_;
+		}
+
+		if (On(allignment))
+		{
+			force = Alignment(p_vehicle_->GameWorld()->Agents()) * weight_alignment_;
+
+			if (!AccumulateForce(v_steering_force_, force)) return v_steering_force_;
+		}
+
+		if (On(cohesion))
+		{
+			force = Cohesion(p_vehicle_->GameWorld()->Agents()) * weight_cohesion_;
+
+			if (!AccumulateForce(v_steering_force_, force)) return v_steering_force_;
+		}
+	}
+
+	else
+	{
+
+		if (On(separation))
+		{
+			force = SeparationPlus(p_vehicle_->GameWorld()->Agents()) * weight_separation_;
+
+			if (!AccumulateForce(v_steering_force_, force)) return v_steering_force_;
+		}
+
+		if (On(allignment))
+		{
+			force = AlignmentPlus(p_vehicle_->GameWorld()->Agents()) * weight_alignment_;
+
+			if (!AccumulateForce(v_steering_force_, force)) return v_steering_force_;
+		}
+
+		if (On(cohesion))
+		{
+			force = CohesionPlus(p_vehicle_->GameWorld()->Agents()) * weight_cohesion_;
+
+			if (!AccumulateForce(v_steering_force_, force)) return v_steering_force_;
+		}
+	}
+
+	if (On(seek))
+	{
+		force = Seek(p_vehicle_->GameWorld()->PickPoint()) * weight_seek_;
+
+		if (!AccumulateForce(v_steering_force_, force)) return v_steering_force_;
+	}
+
+
+	if (On(arrive))
+	{
+		force = Arrive(p_vehicle_->GameWorld()->PickPoint(), deceleration_) * weight_arrive_;
+
+		if (!AccumulateForce(v_steering_force_, force)) return v_steering_force_;
+	}
+
+	if (On(wander))
+	{
+		force = Wander() * weight_wander_;
+
+		if (!AccumulateForce(v_steering_force_, force)) return v_steering_force_;
+	}
+
+	if (On(pursuit))
+	{
+		assert(p_target_agent1_ && "pursuit target not assigned");
+
+		force = Pursuit(p_target_agent1_) * weight_pursuit_;
+
+		if (!AccumulateForce(v_steering_force_, force)) return v_steering_force_;
+	}
+
+	if (On(offset_pursuit))
+	{
+		assert(p_target_agent1_ && "pursuit target not assigned");
+		assert(!offset_.IsZero() && "No offset assigned");
+
+		force = OffsetPursuit(p_target_agent1_, offset_);
+
+		if (!AccumulateForce(v_steering_force_, force)) return v_steering_force_;
+	}
+
+	if (On(interpose))
+	{
+		assert(p_target_agent1_ && p_target_agent2_ && "Interpose agents not assigned");
+
+		force = Interpose(p_target_agent1_, p_target_agent2_) * weight_interpose_;
+
+		if (!AccumulateForce(v_steering_force_, force)) return v_steering_force_;
+	}
+
+	if (On(hide))
+	{
+		assert(p_target_agent1_ && "Hide target not assigned");
+
+		force = Hide(p_target_agent1_, p_vehicle_->GameWorld()->Obstacles()) * weight_hide_;
+
+		if (!AccumulateForce(v_steering_force_, force)) return v_steering_force_;
+	}
+
+
+	if (On(follow_path))
+	{
+		force = FollowPath() * weight_follow_path_;
+
+		if (!AccumulateForce(v_steering_force_, force)) return v_steering_force_;
+	}
+
+	return v_steering_force_;
+}
+
 //---------------------- CalculateWeightedSum ----------------------------
 //
 // 이것은 단순히 모든 '활성화된 동작들 * 가중치'를 합하고 
 // 결과를 반환하기 전에 최대로 이용할 수 있는 조종힘으로 수치를 자릅니다.
 //------------------------------------------------------------------------
 CVector2D CSteeringBehavior::CalculateWeightedSum() {
+	// 다음 세 가지 행동은 집단 행동으로 결합될 수 있다. 
+	// (wander는 이런 결합에 추가되봄직 하다.)
+	if (!IsSpacePartitioningOn())
+	{
+		if (On(separation))
+		{
+			
+			v_steering_force_ += Separation(p_vehicle_->GameWorld()->Agents()) *weight_separation_;
+		}
+
+		if (On(allignment))
+		{
+			v_steering_force_ += Alignment(p_vehicle_->GameWorld()->Agents()) * weight_alignment_;
+		}
+
+		if (On(cohesion))
+		{
+			v_steering_force_ += Cohesion(p_vehicle_->GameWorld()->Agents()) * weight_cohesion_;
+		}
+	}
+	else
+	{
+		if (On(separation))
+		{
+			v_steering_force_ += SeparationPlus(p_vehicle_->GameWorld()->Agents()) * weight_separation_;
+		}
+
+		if (On(allignment))
+		{
+			v_steering_force_ += AlignmentPlus(p_vehicle_->GameWorld()->Agents()) * weight_alignment_;
+		}
+
+		if (On(cohesion))
+		{
+			v_steering_force_ += CohesionPlus(p_vehicle_->GameWorld()->Agents()) * weight_cohesion_;
+		}
+	}
+	
 	if (On(wall_avoidance)) {
 		v_steering_force_ += WallAvoidance(p_vehicle_->GameWorld()->Walls()) * weight_wall_avoidance_;
 	}
@@ -830,10 +1106,201 @@ CVector2D CSteeringBehavior::CalculateWeightedSum() {
 	return v_steering_force_;
 }
 
-CVector2D CSteeringBehavior::CalcuclatePrioritized() {
-	return CVector2D(0.0f, 0.0f);
-}
+//---------------------- CalculateDithered ----------------------------
+//
+//	이 메서드는 각 행동에서 계산된 확률을 할당함으로써 활성화된 행동들을
+//	합한다. 그런 다음 이 시뮬레이션 단계를 계산해야만 하는지를 알기 위해
+//	우선 순위를 테스트한다. 그런 경우, 이것은 해당 행동으로 인한 
+//	조종력을 계산한다. 그것이 영벡터보다 크다면 힘을 반환하고 영벡터이거나
+//	해당 행동이 스킵될 경우, 계속해서 마찬가지로 다음 순위의 행동을 진행한다.
+//
+//	주의 : 모든 행동이 해당 메서드에서 실행되는 것은 아니다. 단지 몇 가지일 뿐이며
+//	일반적인 원리를 터득하게 될 것이다.
+//------------------------------------------------------------------------
+CVector2D CSteeringBehavior::CalculateDithered()
+{
+	// 조종력을 리셋한다.
+	v_steering_force_.Zero();
 
-CVector2D CSteeringBehavior::CalculateDithered() {
-	return CVector2D(0.0f, 0.0f);
+	if (On(wall_avoidance) && RandFloat() < VehiclePrm.pr_wall_avoidance_)
+	{
+		v_steering_force_ = WallAvoidance(p_vehicle_->GameWorld()->Walls()) *
+			weight_wall_avoidance_ / VehiclePrm.pr_wall_avoidance_;
+
+		if (!v_steering_force_.IsZero())
+		{
+			v_steering_force_.Truncate(p_vehicle_->physics_->MaxForce());
+
+			return v_steering_force_;
+		}
+	}
+
+	if (On(obstacle_avoidance) && RandFloat() < VehiclePrm.pr_obstacle_avoidance_)
+	{
+		v_steering_force_ += ObstacleAvoidance(p_vehicle_->GameWorld()->Obstacles()) *
+			weight_obstacle_avoidance_ / VehiclePrm.pr_obstacle_avoidance_;
+
+		if (!v_steering_force_.IsZero())
+		{
+			v_steering_force_.Truncate(p_vehicle_->physics_->MaxForce());
+
+			return v_steering_force_;
+		}
+	}
+
+	if (!IsSpacePartitioningOn())
+	{
+		if (On(separation) && RandFloat() < VehiclePrm.pr_separation_)
+		{
+			v_steering_force_ += Separation(p_vehicle_->GameWorld()->Agents()) *
+				weight_separation_ / VehiclePrm.pr_separation_;
+
+			if (!v_steering_force_.IsZero())
+			{
+				v_steering_force_.Truncate(p_vehicle_->physics_->MaxForce());
+
+				return v_steering_force_;
+			}
+		}
+	}
+
+	else
+	{
+		if (On(separation) && RandFloat() < VehiclePrm.pr_separation_)
+		{
+			v_steering_force_ += SeparationPlus(p_vehicle_->GameWorld()->Agents()) *
+				weight_separation_ / VehiclePrm.pr_separation_;
+
+			if (!v_steering_force_.IsZero())
+			{
+				v_steering_force_.Truncate(p_vehicle_->physics_->MaxForce());
+
+				return v_steering_force_;
+			}
+		}
+	}
+
+
+	if (On(flee) && RandFloat() < VehiclePrm.pr_flee_)
+	{
+		v_steering_force_ += Flee(p_vehicle_->GameWorld()->PickPoint()) * weight_flee_ / VehiclePrm.pr_flee_;
+
+		if (!v_steering_force_.IsZero())
+		{
+			v_steering_force_.Truncate(p_vehicle_->physics_->MaxForce());
+
+			return v_steering_force_;
+		}
+	}
+
+	if (On(evade) && RandFloat() < VehiclePrm.pr_evade_)
+	{
+		assert(p_target_agent1_ && "Evade target not assigned");
+
+		v_steering_force_ += Evade(p_target_agent1_) * weight_evade_ / VehiclePrm.pr_evade_;
+
+		if (!v_steering_force_.IsZero())
+		{
+			v_steering_force_.Truncate(p_vehicle_->physics_->MaxForce());
+
+			return v_steering_force_;
+		}
+	}
+
+
+	if (!IsSpacePartitioningOn())
+	{
+		if (On(allignment) && RandFloat() < VehiclePrm.pr_alignment_)
+		{
+			v_steering_force_ += Alignment(p_vehicle_->GameWorld()->Agents()) *
+				weight_alignment_ / VehiclePrm.pr_alignment_;
+
+			if (!v_steering_force_.IsZero())
+			{
+				v_steering_force_.Truncate(p_vehicle_->physics_->MaxForce());
+
+				return v_steering_force_;
+			}
+		}
+
+		if (On(cohesion) && RandFloat() < VehiclePrm.pr_cohesion_)
+		{
+			v_steering_force_ += Cohesion(p_vehicle_->GameWorld()->Agents()) *
+				weight_cohesion_ / VehiclePrm.pr_cohesion_;
+
+			if (!v_steering_force_.IsZero())
+			{
+				v_steering_force_.Truncate(p_vehicle_->physics_->MaxForce());
+
+				return v_steering_force_;
+			}
+		}
+	}
+	else
+	{
+		if (On(allignment) && RandFloat() < VehiclePrm.pr_alignment_)
+		{
+			v_steering_force_ += AlignmentPlus(p_vehicle_->GameWorld()->Agents()) *
+				weight_alignment_ / VehiclePrm.pr_alignment_;
+
+			if (!v_steering_force_.IsZero())
+			{
+				v_steering_force_.Truncate(p_vehicle_->physics_->MaxForce());
+
+				return v_steering_force_;
+			}
+		}
+
+		if (On(cohesion) && RandFloat() < VehiclePrm.pr_cohesion_)
+		{
+			v_steering_force_ += CohesionPlus(p_vehicle_->GameWorld()->Agents()) *
+				weight_cohesion_ / VehiclePrm.pr_cohesion_;
+
+			if (!v_steering_force_.IsZero())
+			{
+				v_steering_force_.Truncate(p_vehicle_->physics_->MaxForce());
+
+				return v_steering_force_;
+			}
+		}
+	}
+
+	if (On(wander) && RandFloat() < VehiclePrm.pr_wander_)
+	{
+		v_steering_force_ += Wander() * weight_wander_ / VehiclePrm.pr_wander_;
+
+		if (!v_steering_force_.IsZero())
+		{
+			v_steering_force_.Truncate(p_vehicle_->physics_->MaxForce());
+
+			return v_steering_force_;
+		}
+	}
+
+	if (On(seek) && RandFloat() < VehiclePrm.pr_seek_)
+	{
+		v_steering_force_ += Seek(p_vehicle_->GameWorld()->PickPoint()) * weight_seek_ / VehiclePrm.pr_seek_;
+
+		if (!v_steering_force_.IsZero())
+		{
+			v_steering_force_.Truncate(p_vehicle_->physics_->MaxForce());
+
+			return v_steering_force_;
+		}
+	}
+
+	if (On(arrive) && RandFloat() < VehiclePrm.pr_arrive_)
+	{
+		v_steering_force_ += Arrive(p_vehicle_->GameWorld()->PickPoint(), deceleration_) *
+			weight_arrive_ / VehiclePrm.pr_arrive_;
+
+		if (!v_steering_force_.IsZero())
+		{
+			v_steering_force_.Truncate(p_vehicle_->physics_->MaxForce());
+
+			return v_steering_force_;
+		}
+	}
+
+	return v_steering_force_;
 }
